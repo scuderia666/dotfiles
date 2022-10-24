@@ -1,13 +1,13 @@
 local gears = require("gears")
 local awful = require("awful")
+local beautiful = require("beautiful")
 
 local wallpaper = {}
 
 local theme = theme_name
-local config = theme_config
 local path = theme_dir .. "/wallpapers/"
 
-local favorite = config.favorite_wallpaper
+local favorite = beautiful.fav_wp
 
 local wallpaperList
 

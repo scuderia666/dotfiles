@@ -1,13 +1,13 @@
 local awful = require('awful')
 local ruled = require('ruled')
 local beautiful = require('beautiful')
-local app = 'kitty --name QuakeTerminal'
-local client_keys = require('keys')
+local app = 'urxvt -name QuakeTerminal'
+--local client_keys = require('keys')
 quake_id = nil
 local quake_client = nil
 local quake_opened = false
 
-local modkey = require("config").modkey
+local modkey = "Mod4"
 
 local client_buttons = awful.util.table.join(
 	awful.button(
@@ -59,7 +59,7 @@ local quake_properties = function()
 		maximized_horizontal = true,
 		skip_center = true,
 		round_corners = false,
-		keys = client_keys,
+		--keys = client_keys,
 		buttons = client_buttons,
 		placement = awful.placement.top,
 		shape = beautiful.client_shape_rectangle

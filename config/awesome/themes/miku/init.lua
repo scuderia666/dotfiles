@@ -14,7 +14,7 @@ miku.initialize = function()
          awful.tag.add(i, {
             icon = gears.filesystem.get_configuration_dir() .. "/icons/tags/miku/" .. i .. ".png",
             icon_only = true,
-            layout = awful.layout.suit.tile,
+            layout = awful.layout.suit.floating,
             screen = s,
             selected = i == 1
          })
@@ -35,6 +35,8 @@ theme.name = "miku"
 theme.font = "Terminus Bold"
 theme.title_font = "SF Pro Display Medium 10"
 
+theme.fav_wp = "lying.jpg"
+
 -- Background
 theme.bg_normal = "#1f2430"
 theme.bg_dark = "#000000"
@@ -47,6 +49,18 @@ theme.fg_normal = "#ffffff"
 theme.fg_focus = "#e4e4e4"
 theme.fg_urgent = "#ffffff"
 theme.fg_minimize = "#ffffff"
+
+theme.fg_color = "#ccd0d9"
+
+theme.icon_var      = "Material Icons Round "
+theme.icon_alt_var  = "Material Icons Outlined "
+
+theme.black_color = "#000000"
+
+theme.font_var      = theme.font .. " "
+
+theme.rounded       = dpi(8)
+theme.rounded_wids  = dpi(8 - 2)
 
 -- Window Gap Distance
 theme.useless_gap = dpi(9)
@@ -90,9 +104,6 @@ theme.systray_icon_spacing = dpi(5)
 
 -- Titlebars
 theme.titlebars_enabled = true
-
-theme.flash_focus_start_opacity = 0.6 -- the starting opacity
-theme.flash_focus_step = 0.01
 
 -- ===================================================================
 -- Icons
