@@ -1,0 +1,64 @@
+#!/bin/bash
+# Tiny colored fetch script
+# Requires Typicons Font to display the icons
+# elenapan @ github
+
+f=3 b=4
+for j in f b; do
+  for i in {0..7}; do
+    printf -v $j$i %b "\e[${!j}${i}m"
+  done
+done
+d=$'\e[1m'
+t=$'\e[0m'
+v=$'\e[7m'
+
+# Items
+sep=
+s=$d$f0$sep$t
+
+os=$(. /etc/os-release; echo "$ID")
+pkg=$(xbps-query -l | wc -l)
+
+h='wm'
+wmname="$(xprop -id $(xprop -root -notype | awk '$1=="_NET_SUPPORTING_WM_CHECK:"{print $5}') -notype -f _NET_WM_NAME 8t | grep "WM_NAME" | cut -f2 -d \")"
+
+k='krn'
+kernel="$(uname -r | cut -d '-' -f1)"
+
+r='res'
+resolution="$(xwininfo -root | grep geometry | awk '{print $2}' | cut -d + -f1)"
+
+sh='sh'
+shell=$(basename $SHELL)
+
+s='[7m';   e='[m'
+c1='[31m'; c2='[32m'
+c3='[33m'; c4='[34m'
+c5='[35m'; c6='[36m'
+c7='[30m'; c8='[37m'
+palette="$s$c7 $c7 $c1 $c1 $c2 $c2 $c3 $c3 $c4 $c4 $c5 $c5 $c6 $c6 $c8 $c8 $e"
+
+# (\ /)
+# ( · ·)
+# c(")(")
+
+# (\ /)
+# ( . .)
+# c(")(")
+
+tput clear
+cat << EOF
+
+   ${f3}$(hostname)$t's $d$f2$os linux$t
+
+   (\ /)     $d$f4$h  $t$wmname
+   ( $d. .$t)    $d$f5$sh  $t$shell
+   c($f1"$t)($f1"$t)   $d${f1}pk  $t$pkg
+             
+   ${palette}
+EOF
+
+tput civis
+read -n 1
+tput cnorm
