@@ -51,22 +51,6 @@ awful.screen.connect_for_each_screen(function(s)
         },
     }
 
-    local time = {
-        widget = wibox.widget.textclock
-    }
-
-    local power = {
-        widget = wibox.widget.textbox,
-        font = beautiful.icofont .. " 18",
-        markup = helpers.colorizeText('󰐥', beautiful.err),
-        buttons = {
-            awful.button({}, 1, function()
-                awesome.emit_signal("show::exit")
-                menu.visible = false
-            end)
-        },
-    }
-
     local brightness_slider = wibox.widget {
         widget = wibox.widget.slider,
         value = 0,
@@ -225,9 +209,9 @@ awful.screen.connect_for_each_screen(function(s)
             ),
         },
     }
-    
-    hover.add(previous_wallpaper)
-    hover.add(next_wallpaper)
+
+    helpers.add_hover(previous_wallpaper, beautiful.bg, beautiful.bg_3)
+    helpers.add_hover(next_wallpaper, beautiful.bg, beautiful.bg_3)
 
     menu:setup {
         layout = wibox.layout.fixed.vertical,
@@ -241,9 +225,40 @@ awful.screen.connect_for_each_screen(function(s)
                 {
                     layout = wibox.layout.align.horizontal,
                     expand = "none",
-                    time,
+                    {
+                        widget = wibox.widget.textclock
+                    },
                     user,
-                    power
+                    {
+                        widget = wibox.container.margin,
+                        margins = dpi(4),
+                        {
+                            layout = wibox.layout.align.vertical,
+                            spacing = dpi(8),
+                            {
+                                widget = wibox.widget.textbox,
+                                font = beautiful.icofont .. " 18",
+                                markup = helpers.colorizeText('󰐥', beautiful.err),
+                                buttons = {
+                                    awful.button({}, 1, function()
+                                        awesome.emit_signal("popup::show")
+                                        menu.visible = false
+                                    end)
+                                },
+                            },
+                            {
+                                widget = wibox.widget.textbox,
+                                font = beautiful.icofont .. " 18",
+                                markup = helpers.colorizeText('', beautiful.blue),
+                                buttons = {
+                                    awful.button({}, 1, function()
+                                        awful.spawn("i3lock")
+                                        menu.visible = false
+                                    end)
+                                },
+                            }
+                        },
+                    },
                 },
             },
         },
@@ -360,6 +375,10 @@ awful.screen.connect_for_each_screen(function(s)
     end)
 
     awesome.connect_signal("menu::toggle", function()
+        if not menu.visible then
+            update_brightness_slider()
+            update_volume_slider()
+        end
         menu.visible = not menu.visible
     end)
 end)

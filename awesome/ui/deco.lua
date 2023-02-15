@@ -23,7 +23,7 @@ local mkbutton = function (width, color, onclick)
       forced_width  = dpi(width),
       forced_height = dpi(title_size),
       bg            = color,
-      shape         = helpers.rrect(beautiful.rounded * 0.5),
+      shape         = helpers.rrect(6),
       widget        = wibox.container.background
     }
 

@@ -9,26 +9,23 @@ local util = require("util")
 local hover = util.hover
 
 local tasklist_buttons = gears.table.join(
-                 awful.button({ }, 1, function (c)
-                                          if c == client.focus then
-                                              c.minimized = true
-                                          else
-                                              c:emit_signal(
-                                                  "request::activate",
-                                                  "tasklist",
-                                                  {raise = true}
-                                              )
-                                          end
-                                      end),
-                 awful.button({ }, 3, function(c)
-                                          c:kill()
-                                      end),
-                 awful.button({ }, 4, function ()
-                                          awful.client.focus.byidx(1)
-                                      end),
-                 awful.button({ }, 5, function ()
-                                          awful.client.focus.byidx(-1)
-                                      end))
+    awful.button({}, 1, function (c)
+        if c == client.focus then
+            c.minimized = true
+        else
+            c:emit_signal("request::activate", "tasklist", {raise = true})
+        end
+    end),
+    awful.button({}, 3, function(c)
+        c:kill()
+    end),
+    awful.button({}, 4, function()
+        awful.client.focus.byidx(1)
+    end),
+    awful.button({}, 5, function()
+        awful.client.focus.byidx(-1)
+    end)
+)
                                       
 return function(s)
     local screen_height = s.geometry.height
@@ -50,27 +47,24 @@ return function(s)
         shape = helpers.rrect(8),
         {
             widget = wibox.container.margin,
-            margins = 5,
+            margins = dpi(10),
             {
                 widget = wibox.widget.imagebox,
                 image = beautiful.images .. "/void.svg",
-                buttons = {
-                    awful.button({}, 1, function()
-                        awesome.emit_signal("menu::toggle")
-                    end)
-                },
             },
         },
+        buttons = {
+            awful.button({}, 1, function()
+                awesome.emit_signal("menu::toggle")
+            end)
+        },
     }
-    
-    hover.add(menu)
 
     local tasklist = awful.widget.tasklist({
         screen = s,
         filter = awful.widget.tasklist.filter.currenttags,
         layout = {
-            spacing = dpi(6),
-            layout = wibox.layout.fixed.horizontal
+            layout = wibox.layout.flex.horizontal
         },
         buttons = tasklist_buttons,
         style = {
@@ -81,22 +75,26 @@ return function(s)
             shape = helpers.rrect(8)
         },
         widget_template = {
-            layout = wibox.layout.stack,
+            widget = wibox.container.background,
+            bg = beautiful.bg2,
             {
-                widget = wibox.container.margin,
-                margins = dpi(10),
-                awful.widget.clienticon
-            },
-            {
-                widget = wibox.container.margin,
-                margins = { top = 44 },
+                layout = wibox.layout.stack,
                 {
-                    widget = wibox.container.background,
-                    id = "pointer",
-                    bg = beautiful.fg_color,
-                    shape = gears.shape.rounded_bar,
-                    forced_height = dpi(0),
-                    forced_width = dpi(20)
+                    widget = wibox.container.margin,
+                    margins = dpi(10),
+                    awful.widget.clienticon
+                },
+                {
+                    widget = wibox.container.margin,
+                    margins = { top = 44 },
+                    {
+                        widget = wibox.container.background,
+                        id = "pointer",
+                        bg = beautiful.fg_color,
+                        shape = gears.shape.rounded_bar,
+                        forced_height = dpi(0),
+                        forced_width = dpi(20)
+                    },
                 },
             },
             
@@ -157,7 +155,7 @@ return function(s)
         bg = beautiful.bg,
         {
             widget = wibox.container.margin,
-            margins = 4,
+            margins = 6,
             {
                 widget = wibox.widget.textclock,
                 format = helpers.colorizeText("%I : %M", beautiful.fg_color),
@@ -166,16 +164,16 @@ return function(s)
             },
         },
     }
-    
-    hover.add(clock)
+
+    helpers.add_hover(clock, beautiful.bg, beautiful.bg_3)
 
     local layoutbox = awful.widget.layoutbox {
         screen = s,
         buttons = {
-            awful.button({ }, 1, function() awful.layout.inc(1) end),
-            awful.button({ }, 3, function() awful.layout.inc(-1) end),
-            awful.button({ }, 4, function() awful.layout.inc(-1) end),
-            awful.button({ }, 5, function() awful.layout.inc(1) end),
+            awful.button({}, 1, function() awful.layout.inc(1) end),
+            awful.button({}, 3, function() awful.layout.inc(-1) end),
+            awful.button({}, 4, function() awful.layout.inc(-1) end),
+            awful.button({}, 5, function() awful.layout.inc(1) end),
         }
     }
 
@@ -184,12 +182,8 @@ return function(s)
         expand = "none",
         {
             layout = wibox.layout.fixed.horizontal,
-            spacing = dpi(12),
-            {
-                widget = wibox.container.margin,
-                margins = dpi(4),
-                menu
-            },
+            spacing = dpi(9),
+            menu,
             tasklist
         },
         {
@@ -217,7 +211,7 @@ return function(s)
                 {
                     widget = wibox.widget.systray
                 },
-                clock,
+                clock
             },
         },
     }

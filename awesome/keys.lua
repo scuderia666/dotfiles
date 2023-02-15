@@ -23,7 +23,11 @@ awful.keyboard.append_global_keybindings({
     
     awful.key({ mod }, "r", function()
 		awful.spawn(launcher)
-	end)
+	end),
+    
+    awful.key({ mod }, "l", function()
+        awesome.emit_signal("lockscreen::show")
+    end)
 
 })
 
@@ -32,26 +36,38 @@ awful.keyboard.append_global_keybindings({
     awful.key({}, "XF86MonBrightnessUp", function() 
         awful.spawn("brightnessctl set 10+ -q", false)
         awesome.emit_signal("update::brightness")
+        awesome.emit_signal("hide_indicator::volume")
+        awesome.emit_signal("show_indicator::brightness")
     end),
 
     awful.key({}, "XF86MonBrightnessDown", function()
         awful.spawn("brightnessctl set 10- -q", false)
         awesome.emit_signal("update::brightness")
+        awesome.emit_signal("hide_indicator::volume")
+        awesome.emit_signal("show_indicator::brightness")
     end),
     
     awful.key({}, "XF86AudioRaiseVolume", function()
         awful.spawn("amixer set Master 5%+", false)
         awesome.emit_signal("update::volume")
+        awesome.emit_signal("hide_indicator::brightness")
+        awesome.emit_signal("show_indicator::volume")
     end),
     
     awful.key({}, "XF86AudioLowerVolume", function()
         awful.spawn("amixer set Master 5%-", false)
         awesome.emit_signal("update::volume")
+        awesome.emit_signal("hide_indicator::brightness")
+        awesome.emit_signal("show_indicator::volume")
     end),
     
-    awful.key({}, "F12",  function()
+    awful.key({}, "F12", function()
         awful.spawn.easy_async_with_shell("maim -u ~/screenshots/$(date +%s).png")
-    end)
+    end),
+
+    awful.key({shift}, "F12", function()
+        awful.spawn.easy_async_with_shell("maim -s -u | xclip -selection clipboard -t image/png")
+    end),
 
 })
 

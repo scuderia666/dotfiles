@@ -3,26 +3,14 @@ local run = require("util").run
 
 local config_dir = filesystem.get_configuration_dir()
 
-function tableMerge(t1, t2)
-    for k,v in pairs(t2) do
-        if type(v) == "table" then
-            if type(t1[k] or false) == "table" then
-                tableMerge(t1[k] or {}, t2[k] or {})
-            else
-                t1[k] = v
-            end
-        else
-            t1[k] = v
-        end
-    end
-    return t1
-end
-
 terminal = "tym"
 browser = "firefox"
 file_manager = "thunar"
 
 launcher = "rofi -no-lazy-grab -show drun -modi drun -theme " .. config_dir .. "/ui/rofi.rasi"
+
+poweroff_cmd = "doas poweroff"
+reboot_cmd = "doas reboot"
 
 require("theme")
 require("ui")
@@ -42,5 +30,5 @@ run.run_once_ps(
     "polkit-gnome-authentication-agent-1",
     "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
 )
-run.run_once_grep("nm-applet")
+run.run_once_pgrep("nm-applet")
 run.run_once_pgrep("pipewire")

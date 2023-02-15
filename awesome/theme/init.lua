@@ -61,7 +61,7 @@ colors.err = "#AF575B"
 colors.pri = "#7D95AE"
 colors.dis = "#a07ea7"
 
-beautiful.init(tableMerge(colors,{
+beautiful.init(helpers.tableMerge(colors,{
     images = _images,
 
     icofont = "Material Design Icons Desktop",
