@@ -11,7 +11,6 @@ awful.screen.connect_for_each_screen(function(s)
         screen = s,
         width = screen_width,
         height = screen_height,
-        bg = beautiful.red,
         ontop = true,
         visible = false
     })
@@ -53,11 +52,12 @@ awful.screen.connect_for_each_screen(function(s)
     local tries = 0
 
     local max_tries = 3
-    local max_character = 8
+    local max_character = 10
 
     local promptbox = wibox.widget {
         widget = wibox.widget.textbox,
-        font = "terminuss 40"
+        font = "terminuss 40",
+        align = "center",
     }
 
     local type = function(number)
@@ -187,31 +187,31 @@ awful.screen.connect_for_each_screen(function(s)
 
     local buttons = wibox.layout {
         layout = wibox.layout.flex.vertical,
-        spacing = 30,
+        spacing = 25,
         {
             layout = wibox.layout.flex.horizontal,
-            spacing = 30,
+            spacing = 20,
             create_button(1),
             create_button(2),
             create_button(3)
         },
         {
             layout = wibox.layout.flex.horizontal,
-            spacing = 30,
+            spacing = 20,
             create_button(4),
             create_button(5),
             create_button(6),
         },
         {
             layout = wibox.layout.flex.horizontal,
-            spacing = 30,
+            spacing = 20,
             create_button(7),
             create_button(8),
             create_button(9)
         },
         {
             layout = wibox.layout.flex.horizontal,
-            spacing = 30,
+            spacing = 20,
             send_widget,
             backspace_widget
         },
@@ -220,17 +220,54 @@ awful.screen.connect_for_each_screen(function(s)
     lockscreen:setup {
         layout = wibox.layout.stack,
         {
+            widget = wibox.widget.imagebox,
+            image = beautiful.images .. "/lockscreen.png"
+        },
+        {
             widget = wibox.container.margin,
             margins = { right = 400, left = 400 },
             {
+                widget = wibox.container.margin,
+                margins = { top = 140, bottom = 100 },
+                {
+                    layout = wibox.layout.align.vertical,
+                    expand = "none",
+                    spacing = 10,
+                    {
+                        widget = wibox.container.background,
+                        shape = helpers.rrect(32),
+                        bg = beautiful.bg3,
+                        opacity = 0.6,
+                        promptbox
+                    },
+                    nil,
+                    {
+                        layout = wibox.layout.stack,
+                        {
+                            widget = wibox.container.background,
+                            bg = beautiful.bg3,
+                            shape = helpers.rrect(32),
+                            opacity = 0.8,
+                        },
+                        {
+                            widget = wibox.container.margin,
+                            margins = 25,
+                            buttons
+                        },
+                    },
+                },
+            },
+            --[[{
                 layout = wibox.layout.align.vertical,
+                expand = "none",
                 spacing = 20,
                 {
                     widget = wibox.container.margin,
                     margins = { top = 80 },
                     {
                         widget = wibox.container.background,
-                        bg = beautiful.blue,
+                        shape = helpers.rrect(32),
+                        bg = beautiful.bg3,
                         promptbox
                     },
                 },
@@ -247,7 +284,7 @@ awful.screen.connect_for_each_screen(function(s)
                         },
                     },
                 },
-            },
+            },]]--
         },
     }
 
