@@ -1,0 +1,59 @@
+awful.screen.connect_for_each_screen(function(s)
+    local screen_width = s.geometry.width
+    local screen_height = s.geometry.height
+
+    my_wbox = wibox()
+    my_wbox.visible = true
+    my_wbox:set_bg(beautiful.bg .. "00")
+    my_wbox:geometry({width=screen_width, height=screen_height})
+    
+    local manual = wibox.layout {
+        layout = wibox.layout.manual
+    }
+
+    local rect = wibox.widget {
+        fit = function(self, context, width, height)
+            return height, height
+        end,
+        draw = function(self, context, cr, width, height)
+            cr:set_source_rgb(1, 0, 0)
+            cr:rectangle(100, 100, 40, 40)
+            cr:fill()
+        end,
+        layout = wibox.widget.base.make_widget,
+    }
+    
+    manual:add(rect)
+
+    rect:connect_signal("button::press", function(_, _, _, button)
+        local startpos = mouse.coords()
+
+        if not mousegrabber.isrunning() then
+            mousegrabber.run(function(mouse)
+                if (math.abs(mouse.x - startpos.x) > 10 or
+                    math.abs(mouse.y - startpos.y) > 10) and
+                    mouse.buttons[1] then
+
+                    manual:move_widget(rect, {
+                        x = mouse.x - dpi(50),
+                        y = mouse.y - dpi(50)
+                    })
+                end
+            end, "hand2")
+        end
+    end)
+
+    local function move()
+        local pos = mouse.coords()
+        
+        manual:move_widget(rect, {
+            x = pos.x,
+            y = pos.y
+          })
+    end
+
+    my_wbox:setup {
+        layout = wibox.layout.stack,
+        manual
+    }
+end)

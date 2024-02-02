@@ -6,6 +6,8 @@ local helpers = require("modules.helpers")
 local dpi = beautiful.xresources.apply_dpi
 local rubato = require("modules.rubato")
 
+local brightness = require("modules.brightness")
+
 local args = {
     bg = "#4c587b",
 
@@ -22,13 +24,8 @@ return function(s)
     local indicator = require("ui.indicator.indicator")("brightness", s, args)
 
     local update_slider = function()
-        awful.spawn.easy_async_with_shell(
-            "brightnessctl | grep -i  'current' | awk '{ print $4}' | tr -d \"(%)\"",
-            function(stdout)
-                local val = string.gsub(stdout, "^%s*(.-)%s*$", "%1")
-                indicator.update(tonumber(val))
-            end
-        )
+        local val = string.gsub("100", "^%s*(.-)%s*$", "%1")
+        indicator.update(tonumber(val) * 100)
     end
 
     update_slider()
@@ -38,7 +35,7 @@ return function(s)
     end)
 
     awesome.connect_signal("set::brightness", function(value)
-        awful.spawn("brightnessctl set " .. value .. "%", false)
+        brightness.set_brightness(value/100)
     end)
     
     return indicator

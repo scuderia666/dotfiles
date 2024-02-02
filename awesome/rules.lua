@@ -8,20 +8,25 @@ ruled.client.connect_signal("request::rules", function()
         id = "global",
         rule = {},
         properties = {
-            focus               = awful.client.focus.filter,
-            raise               = true,
-            size_hints_honor    = false,
-            screen              = awful.screen.preferred,
-            titlebars_enabled   = true,
-            placement           = awful.placement.centered + awful.placement.no_overlap + awful.placement.no_offscreen
+            focus = awful.client.focus.filter,
+            raise = true,
+            floating = false,
+            screen = awful.screen.preferred,
+            placement = awful.placement.no_overlap + awful.placement.no_offscreen,
         }
     }
 
     ruled.client.append_rule {
-        id          = "tasklist_order",
-        rule        = {},
-        properties  = {},
-        callback    = awful.client.setslave
+        id         = "dialog",
+        rule_any   = {
+            type  = { "dialog", "splash" },
+            name = {"Discord Updater"}
+        },
+        properties = {
+            floating = true,
+            ontop = true,
+            placement = awful.placement.centered
+        }
     }
 
 end)

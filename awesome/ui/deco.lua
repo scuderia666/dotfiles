@@ -23,7 +23,7 @@ local mkbutton = function (width, color, onclick)
       forced_width  = dpi(width),
       forced_height = dpi(title_size),
       bg            = color,
-      shape         = helpers.rrect(6),
+      shape         = helpers.rrect(4),
       widget        = wibox.container.background
     }
 
@@ -56,11 +56,11 @@ local close = mkbutton(title_size * 4/3, beautiful.red, function(c)
     c:kill()
 end)
 
-local maximize = mkbutton(title_size * 3/4, beautiful.ylw, function(c)
+local maximize = mkbutton(title_size * 3/4, beautiful.yellow, function(c)
     c.maximized = not c.maximized
 end)
 
-local sticky = mkbutton(title_size * 3/4, beautiful.grn, function(c)
+local sticky = mkbutton(title_size * 3/4, beautiful.green, function(c)
     c.sticky = not c.sticky
 end)
 
@@ -72,6 +72,7 @@ client.connect_signal("request::titlebars", function(c)
     if c.requests_no_titlebar then
         return
     end
+
     -- buttons for the titlebar
     local buttons = {
         awful.button({ }, 1, function()
@@ -82,13 +83,58 @@ client.connect_signal("request::titlebars", function(c)
         end),
     }
 
-    local n_titlebar = awful.titlebar(c, {
-            size        = title_size,
-            position    = "top",
-        })
-    n_titlebar.widget = {
+    local titlebar = awful.titlebar(c, {
+        size        = title_size,
+        position    = "top",
+    })
+    
+    local title_buttons = wibox.widget {
+        widget = wibox.container.margin,
+        margins = dpi(title_size / 3),
         {
-            { -- Left
+            layout = wibox.layout.fixed.horizontal,
+            spacing = dpi(title_size / 4),
+            {
+                close(c),
+                direction = "north",
+                widget = wibox.container.rotate
+            },
+            {
+                maximize(c),
+                direction = "north",
+                widget = wibox.container.rotate
+            },
+            {
+                sticky(c),
+                direction = "north",
+                widget = wibox.container.rotate
+            }
+        }
+    }
+    
+    local title = wibox.widget {
+        widget = awful.titlebar.widget.titlewidget(c),
+        font = "terminuss 12",
+        align = "center"
+    }
+
+    titlebar.widget = {
+        layout = wibox.layout.stack,
+        {
+            layout = wibox.layout.fixed.horizontal,
+            buttons = buttons,
+        },
+        {
+            layout = wibox.layout.align.horizontal,
+            expand = "none",
+            title_buttons,
+            title,
+        }
+    }
+
+    --[[titlebar.widget = {
+        {
+            {
                 {
                   close(c),
                   direction = "north",
@@ -107,11 +153,11 @@ client.connect_signal("request::titlebars", function(c)
                 spacing = dpi(title_size / 4),
                 layout  = wibox.layout.fixed.horizontal
             },
-            { -- Middle
+            {
                 buttons = buttons,
                 layout  = wibox.layout.fixed.horizontal
             },
-            { -- Right
+            {
                 buttons = buttons,
                 layout  = wibox.layout.fixed.horizontal
             },
@@ -123,5 +169,5 @@ client.connect_signal("request::titlebars", function(c)
         left    = dpi(title_size / 3),
         right   = dpi(title_size / 2),
         widget  = wibox.container.margin
-    }
+    }]]--
 end)

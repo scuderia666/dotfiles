@@ -130,6 +130,20 @@ return function(name, s, args)
         icon.top = 180 - 160/ratio
         awesome.emit_signal("set::" .. name, value)
     end
+    
+    local sett = function(val)
+        if val > 100 then
+            val = 100
+        elseif val < 0 then
+            val = 0
+        end
+        local old_ratio = 100/value
+        local ratio = 100/val
+        value = val
+        occupy.top = 160 - 160/ratio
+        icon.top = 180 - 160/ratio
+        awesome.emit_signal("set::" .. name, value)
+    end
 
     slider:buttons {
         awful.button({}, 4, function()
@@ -152,9 +166,9 @@ return function(name, s, args)
             end
 
             value = val
-            set(100 - diff)
+            sett(100 - diff)
         else
-            set(val)
+            sett(val)
         end
     end
 

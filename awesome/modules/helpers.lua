@@ -4,8 +4,8 @@ local beautiful = require("beautiful")
 local gears     = require("gears")
 local dpi       = beautiful.xresources.apply_dpi
 
-local color     = require('modules.color')
-local rubato    = require('modules.rubato')
+local color     = require("modules.color")
+local rubato    = require("modules.rubato")
 
 helpers.rrect = function(radius)
   radius = radius or dpi(4)
@@ -25,7 +25,7 @@ helpers.clickKey = function(c, key)
 end
 
 helpers.colorizeText = function(txt, fg)
-  if fg == "" then
+  if fg == nil then
     fg = "#ffffff"
   end
 
@@ -42,7 +42,7 @@ function helpers.apply_transition(opts)
     local hover_background = color.color { hex = hbg }
     local transition       = color.transition(background, hover_background, color.transition.RGB)
     local fading = rubato.timed {
-        duration = 0.30,
+        duration = opts.duration or 0.30,
     }
     fading:subscribe(function(pos)
         element[prop] = transition(pos / 100).hex

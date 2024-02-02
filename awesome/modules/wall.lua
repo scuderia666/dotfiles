@@ -22,7 +22,7 @@ wall.scan_dir = function(directory)
 end
 
 wall.get_wallpaper = function(name)
-	local wallpaper = wallpapers .. name
+	local wallpaper = wall.wallpapers .. name
 	if gears.filesystem.file_readable(wallpaper) then
 		return wallpaper
 	end

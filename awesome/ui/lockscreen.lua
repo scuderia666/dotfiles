@@ -1,20 +1,58 @@
 local awful = require("awful")
 local wibox = require("wibox")
 local beautiful = require("beautiful")
+
 local helpers = require("modules.helpers")
+local rubato = require("modules.rubato")
+
+local blur_background = false
+local tmp_dir = "/tmp/awesomewm/"
+
+local filter_bg_image = function(wall_name, ap, width, height)
+	local blur_filter_param = ''
+	if blur_background then
+		blur_filter_param = '-filter Gaussian -blur 0x10'
+	end
+
+	local magic = [[
+	sh -c "
+	if [ ! -d ]] .. tmp_dir ..[[ ];
+	then
+		mkdir -p ]] .. tmp_dir .. [[;
+	fi
+	convert -quality 100 -brightness-contrast -20x0 ]] .. ' '  .. blur_filter_param .. ' '.. beautiful.images .. "/" .. wall_name .. 
+	[[ -gravity center -crop ]] .. ap .. [[:1 +repage -resize ]] .. width .. 'x' .. height .. 
+	[[! ]] .. tmp_dir .. wall_name .. [[
+	"]]
+	return magic
+end
 
 awful.screen.connect_for_each_screen(function(s)
     local screen_width = s.geometry.width
     local screen_height = s.geometry.height
+
+    local aspect_ratio = screen_width / screen_height
+    aspect_ratio = math.floor(aspect_ratio * 100) / 100
+
+    --local cmd = nil
+    --cmd = filter_bg_image("lockscreen.png", aspect_ratio, screen_width, screen_height)
 
     local lockscreen = wibox({
         screen = s,
         width = screen_width,
         height = screen_height,
         ontop = true,
-        visible = false
+        visible = false,
+        bgimage = beautiful.images .. "/lockscreen.png"
     })
-    
+
+    --[[awful.spawn.easy_async_with_shell(
+        cmd,
+        function()
+            lockscreen.bgimage = tmp_dir .. "lockscreen.png"
+        end
+    )]]--
+
     function tablelength(T)
         local count = 0
         for _ in pairs(T) do count = count + 1 end
@@ -41,7 +79,7 @@ awful.screen.connect_for_each_screen(function(s)
     }
 
     local pass={}
-    str="753268"
+    str="xdrefc"
     str:gsub(".", function(c) table.insert(pass,c) end)
 
     local len = string.len(str)
@@ -56,24 +94,24 @@ awful.screen.connect_for_each_screen(function(s)
 
     local promptbox = wibox.widget {
         widget = wibox.widget.textbox,
-        font = "terminuss 40",
+        font = "Cantarell 40",
         align = "center",
     }
 
-    local type = function(number)
+    local type = function(key)
         if characters_entered == max_character then
             return
         end
 
         local needed = pass[correct_count + 1]
 
-        if correct_count == characters_entered and tonumber(number) == tonumber(needed) then
+        if correct_count == characters_entered and key == needed then
             correct_count = correct_count + 1
         end
 
         characters_entered = characters_entered + 1
         
-        promptbox.markup = helpers.colorizeText(string.rep("", characters_entered), beautiful.fg_color)
+        promptbox.markup = helpers.colorizeText(string.rep("*", characters_entered), beautiful.fg)
     end
     
     local reset = function()
@@ -99,6 +137,10 @@ awful.screen.connect_for_each_screen(function(s)
     end
     
     local send = function()
+        if characters_entered == 0 then
+            return
+        end
+
         if not check() then
             reset()
 
@@ -120,7 +162,7 @@ awful.screen.connect_for_each_screen(function(s)
                     
             characters_entered = characters_entered - 1
 
-            promptbox.markup = helpers.colorizeText(string.rep("", characters_entered), beautiful.fg_color)
+            promptbox.markup = helpers.colorizeText(string.rep("*", characters_entered), beautiful.fg)
         end
     end
 
@@ -136,14 +178,39 @@ awful.screen.connect_for_each_screen(function(s)
             },
         }
 
-        widget:buttons {
-            awful.button({}, 1, function()
-                type(number)
-                check(number)
-            end)
+        local transition = helpers.apply_transition {
+            element = widget,
+            prop    = 'bg',
+            bg      = beautiful.bg,
+            hbg     = beautiful.accent,
+            duration = 0.15,
         }
 
-        helpers.add_hover(widget, beautiful.bg, beautiful.bg2)
+        local timed = rubato.timed {
+            duration = 0.25,
+        }
+
+        timed:subscribe(function(pos)
+            widget.shape = helpers.rrect(28 - pos)
+        end)
+
+        widget:connect_signal("button::press", function()
+            timed.target = 20
+        end)
+
+        widget:connect_signal("button::release", function()
+            type(number)
+            check(number)
+        end)
+
+        widget:connect_signal("mouse::enter", function()
+            transition.on()
+        end)
+
+        widget:connect_signal("mouse::leave", function()
+            transition.off()
+            timed.target = 8
+        end)
 
         return widget
     end
@@ -216,75 +283,46 @@ awful.screen.connect_for_each_screen(function(s)
             backspace_widget
         },
     }
+    
+    local clock_format = '<span font="Inter Bold 52">%H:%M</span>'
 
+    local time = wibox.widget.textclock(clock_format, 1)
+    
+    local test_bg = function(color)
+        return wibox.widget {
+            widget = wibox.widget.background,
+            bg = color
+        }
+    end
+    
     lockscreen:setup {
         layout = wibox.layout.stack,
-        {
-            widget = wibox.widget.imagebox,
-            image = beautiful.images .. "/lockscreen.png"
-        },
         {
             widget = wibox.container.margin,
             margins = { right = 400, left = 400 },
             {
-                widget = wibox.container.margin,
-                margins = { top = 140, bottom = 100 },
+                layout = wibox.layout.flex.vertical,
+                {
+                    widget = wibox.container.margin,
+                    margins = 80,
+                    {
+                        widget = wibox.container.place,
+                        time
+                    },
+                },
                 {
                     layout = wibox.layout.align.vertical,
                     expand = "none",
-                    spacing = 10,
+                    spacing = 20,
                     {
                         widget = wibox.container.background,
                         shape = helpers.rrect(32),
                         bg = beautiful.bg3,
                         opacity = 0.6,
-                        promptbox
-                    },
-                    nil,
-                    {
-                        layout = wibox.layout.stack,
-                        {
-                            widget = wibox.container.background,
-                            bg = beautiful.bg3,
-                            shape = helpers.rrect(32),
-                            opacity = 0.8,
-                        },
-                        {
-                            widget = wibox.container.margin,
-                            margins = 25,
-                            buttons
-                        },
+                        promptbox,
                     },
                 },
             },
-            --[[{
-                layout = wibox.layout.align.vertical,
-                expand = "none",
-                spacing = 20,
-                {
-                    widget = wibox.container.margin,
-                    margins = { top = 80 },
-                    {
-                        widget = wibox.container.background,
-                        shape = helpers.rrect(32),
-                        bg = beautiful.bg3,
-                        promptbox
-                    },
-                },
-                {
-                    widget = wibox.container.margin,
-                    margins = { top = 300 },
-                    {
-                        widget = wibox.container.background,
-                        bg = beautiful.blue,
-                        {
-                            widget = wibox.container.margin,
-                            margins = 20,
-                            buttons
-                        },
-                    },
-                },
-            },]]--
         },
     }
 
@@ -317,5 +355,12 @@ awful.screen.connect_for_each_screen(function(s)
     awesome.connect_signal("lockscreen::show", function()
         lockscreen.visible = true
         password_grabber:start()
+    end)
+
+    awesome.connect_signal("lockscreen::test", function()
+        lockscreen.visible = not lockscreen.visible
+        reset()
+        type("a")
+        type("b")
     end)
 end)

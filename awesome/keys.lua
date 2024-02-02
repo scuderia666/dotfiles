@@ -1,6 +1,10 @@
 local awful = require("awful")
 local filesystem = require("gears.filesystem")
-local config_dir = filesystem.get_configuration_dir()
+
+local brightness = require("modules.brightness")
+local volume = require("modules.volume")
+
+local settings = require "setup".settings
 
 local mod = "Mod4"
 local shift = "Shift"
@@ -10,15 +14,15 @@ local alt = "Mod1"
 awful.keyboard.append_global_keybindings({
 
 	awful.key({ mod }, "Return", function()
-		awful.spawn(terminal)
+		awful.spawn(settings.terminal)
 	end),
-    
+
     awful.key({ mod }, "e", function()
-		awful.spawn(file_manager)
+		awful.spawn(settings.file_manager)
 	end),
     
     awful.key({ mod }, "b", function()
-		awful.spawn(browser)
+		awful.spawn(settings.browser)
 	end),
     
     awful.key({ mod }, "r", function()
@@ -27,46 +31,46 @@ awful.keyboard.append_global_keybindings({
     
     awful.key({ mod }, "l", function()
         awesome.emit_signal("lockscreen::show")
+    end),
+    
+    awful.key({ mod, shift }, "l", function()
+        awesome.emit_signal("lockscreen::test")
     end)
 
 })
 
 awful.keyboard.append_global_keybindings({
 
-    awful.key({}, "XF86MonBrightnessUp", function() 
-        awful.spawn("brightnessctl set 10+ -q", false)
-        awesome.emit_signal("update::brightness")
-        awesome.emit_signal("hide_indicator::volume")
-        awesome.emit_signal("show_indicator::brightness")
+    awful.key({}, "XF86MonBrightnessUp", function()
+        brightness.brightness_up()
     end),
 
     awful.key({}, "XF86MonBrightnessDown", function()
-        awful.spawn("brightnessctl set 10- -q", false)
-        awesome.emit_signal("update::brightness")
-        awesome.emit_signal("hide_indicator::volume")
-        awesome.emit_signal("show_indicator::brightness")
-    end),
-    
-    awful.key({}, "XF86AudioRaiseVolume", function()
-        awful.spawn("amixer set Master 5%+", false)
-        awesome.emit_signal("update::volume")
-        awesome.emit_signal("hide_indicator::brightness")
-        awesome.emit_signal("show_indicator::volume")
-    end),
-    
-    awful.key({}, "XF86AudioLowerVolume", function()
-        awful.spawn("amixer set Master 5%-", false)
-        awesome.emit_signal("update::volume")
-        awesome.emit_signal("hide_indicator::brightness")
-        awesome.emit_signal("show_indicator::volume")
-    end),
-    
-    awful.key({}, "F12", function()
-        awful.spawn.easy_async_with_shell("maim -u ~/screenshots/$(date +%s).png")
+        brightness.brightness_down()
     end),
 
-    awful.key({shift}, "F12", function()
-        awful.spawn.easy_async_with_shell("maim -s -u | xclip -selection clipboard -t image/png")
+    awful.key({}, "XF86AudioRaiseVolume", function()
+        brightness.volume_up()
+    end),
+
+    awful.key({}, "XF86AudioLowerVolume", function()
+        brightness.volume_down()
+    end),
+    
+    awful.key({}, "Print", function()
+        awful.util.spawn_with_shell("bash " .. filesystem.get_configuration_dir() .. "/scripts/monitorshot.sh")
+    end),
+    
+    awful.key({ctrl}, "Print", function()
+        awful.util.spawn_with_shell("bash " .. filesystem.get_configuration_dir() .. "/scripts/monitorshot.sh clipboard")
+    end),
+    
+    awful.key({alt}, "Print", function()
+        awful.util.spawn_with_shell("maim -s -u ~/screenshots/$(date +%s).png")
+    end),
+
+    awful.key({shift}, "Print", function()
+        awful.util.spawn_with_shell("maim -s -u | xclip -selection clipboard -t image/png")
     end),
 
 })
@@ -139,7 +143,22 @@ client.connect_signal("request::default_keybindings", function()
     })
 end)
 
+local menu = require("ui.rightclick")
+
 awful.mouse.append_global_mousebindings({
-    awful.button({ }, 4, awful.tag.viewprev),
-    awful.button({ }, 5, awful.tag.viewnext),
+    awful.button({}, 3, function()
+        menu.desktop:toggle()
+        return
+    end),
+})
+
+awful.keyboard.append_global_keybindings({require("ui.capslock").key})
+
+awful.keyboard.append_global_keybindings({
+	awful.key({ mod }, "Tab", function()
+		awful.client.focus.byidx(1)
+		if client.focus then
+			client.focus:raise()
+		end
+	end)
 })

@@ -6,6 +6,8 @@ local helpers = require("modules.helpers")
 local dpi = beautiful.xresources.apply_dpi
 local rubato = require("modules.rubato")
 
+local volume = require("modules.volume")
+
 local default = {
     bg = "#393A3D",
     line_color = "#A6AEC2",
@@ -51,7 +53,7 @@ return function(s)
     end)
     
     awesome.connect_signal("set::volume", function(value)
-        awful.spawn("amixer set Master " .. value .."%", false)
+        volume.set_volume(value)
     end)
     
     return indicator

@@ -7,7 +7,11 @@ local gears = require("gears")
 local util = require("util")
 local hover = util.hover
 
+local brightness_module = require("modules.brightness")
+local volume_module = require("modules.volume")
+
 awful.screen.connect_for_each_screen(function(s)
+    local screen_width = s.geometry.width
     local screen_height = s.geometry.height
 
     local menu = wibox({
@@ -16,9 +20,9 @@ awful.screen.connect_for_each_screen(function(s)
         screen = s,
         width = dpi(480),
         height = dpi(400),
-        x = 15,
-        y = screen_height - dpi(450),
-        bg = beautiful.bg_3,
+        x = 8,
+        y = screen_height - 452,
+        bg = beautiful.bg3,
         ontop = true,
         visible = false,
     })
@@ -59,14 +63,14 @@ awful.screen.connect_for_each_screen(function(s)
         forced_height = dpi(40),
         shape = gears.shape.rounded_bar,
         bar_shape = gears.shape.rounded_bar,
-        bar_color = beautiful.fg_color .. "33",
+        bar_color = beautiful.bg4,
         bar_margins = {bottom = dpi(18) ,top = dpi(18)},
-        bar_active_color = beautiful.accent,
+        bar_active_color = beautiful.bg,
         handle_width = dpi(14),
         handle_shape = gears.shape.circle,
-        handle_color = beautiful.accent,
+        handle_color = beautiful.red,
         handle_border_width = 3,
-        handle_border_color = beautiful.bg_3
+        handle_border_color = beautiful.bg3
     }
 
     local volume_slider = wibox.widget {
@@ -77,14 +81,14 @@ awful.screen.connect_for_each_screen(function(s)
         forced_height = dpi(40),
         shape = gears.shape.rounded_bar,
         bar_shape = gears.shape.rounded_bar,
-        bar_color = beautiful.fg_color .. "33",
+        bar_color = beautiful.bg4,
         bar_margins = {bottom = dpi(18) ,top = dpi(18)},
-        bar_active_color = beautiful.accent,
+        bar_active_color = beautiful.bg,
         handle_width = dpi(14),
         handle_shape = gears.shape.circle,
-        handle_color = beautiful.accent,
+        handle_color = beautiful.red,
         handle_border_width = 3,
-        handle_border_color = beautiful.bg_3
+        handle_border_color = beautiful.bg3
     }
 
     local brightness_icon = {
@@ -103,7 +107,7 @@ awful.screen.connect_for_each_screen(function(s)
 
     local brightness_text = wibox.widget{
         widget = wibox.widget.textbox,
-        markup = helpers.colorizeText("0%", beautiful.fg_color),
+        markup = helpers.colorizeText("0%", beautiful.fg),
         font = "Roboto 10",
         align = "center",
         valign = "center"
@@ -111,7 +115,7 @@ awful.screen.connect_for_each_screen(function(s)
     
     local volume_text = wibox.widget{
         widget = wibox.widget.textbox,
-        markup = helpers.colorizeText("0%", beautiful.fg_color),
+        markup = helpers.colorizeText("0%", beautiful.fg),
         font = "Roboto 10",
         align = "center",
         valign = "center"
@@ -252,7 +256,7 @@ awful.screen.connect_for_each_screen(function(s)
                                 markup = helpers.colorizeText('', beautiful.blue),
                                 buttons = {
                                     awful.button({}, 1, function()
-                                        awful.spawn("i3lock")
+                                        awesome.emit_signal("lockscreen::show")
                                         menu.visible = false
                                     end)
                                 },
@@ -329,29 +333,24 @@ awful.screen.connect_for_each_screen(function(s)
     ))
 
     brightness_slider:connect_signal("property::value", function(_, new_value)
-        brightness_text.markup = helpers.colorizeText(new_value .. "%", beautiful.fg_color)
+        brightness_text.markup = helpers.colorizeText(new_value .. "%", beautiful.fg)
         brightness_slider.value = new_value
-        awful.spawn("brightnessctl set " .. new_value .."%", false)
+        brightness_module.set_brightness(new_value)
     end)
     
     volume_slider:connect_signal("property::value", function()
         local volume_level = volume_slider:get_value()
-        volume_text.markup = helpers.colorizeText(volume_level .. "%", beautiful.fg_color)
+        volume_text.markup = helpers.colorizeText(volume_level .. "%", beautiful.fg)
         volume_slider.value = volume_level
-        awful.spawn("amixer set Master " .. volume_level .. "%", false)
+        volume_module.set_volume(volume_level)
     end)
 
     local update_brightness_slider = function()
-        awful.spawn.easy_async_with_shell(
-            "brightnessctl | grep -i  'current' | awk '{ print $4}' | tr -d \"(%)\"",
-            function(stdout)
-                local value = string.gsub(stdout, "^%s*(.-)%s*$", "%1")
-                brightness_slider:set_value(tonumber(value))
-                brightness_text.text = value .. "%"
-            end
-        )
+        local value = string.gsub("100", "^%s*(.-)%s*$", "%1")
+        brightness_slider:set_value(tonumber(value))
+        brightness_text.text = value .. "%"
     end
-    
+
     local update_volume_slider = function()
         awful.spawn.easy_async_with_shell(
             "amixer sget Master | awk -F'[][]' '/Right:|Mono:/ && NF > 1 {sub(/%/, \"\"); printf \"%0.0f\", $2}'",
@@ -369,7 +368,7 @@ awful.screen.connect_for_each_screen(function(s)
     awesome.connect_signal("update::brightness", function()
         update_brightness_slider()
     end)
-    
+
     awesome.connect_signal("update::volume", function()
         update_volume_slider()
     end)

@@ -5,6 +5,8 @@ local helpers = require("modules.helpers")
 local dpi = beautiful.xresources.apply_dpi
 local hover = require("util").hover
 
+local settings = require "setup".settings
+
 local prompt, popup
 local execute = ""
 
@@ -67,8 +69,8 @@ awful.screen.connect_for_each_screen(function(s)
         visible = false,
     })
 
-    local poweroff = make_button("power.svg", poweroff_cmd)
-    local restart = make_button("restart.svg", reboot_cmd)
+    local poweroff = make_button("power.svg", settings.poweroff_cmd)
+    local restart = make_button("restart.svg", settings.reboot_cmd)
     local logout = make_button("logout.png", "awesome-client 'awesome.quit()'")
 
     popup:setup {
