@@ -172,7 +172,7 @@ awful.screen.connect_for_each_screen(function(s)
             },
             {
                 widget = wibox.container.margin,
-                margins = 8,
+                margins = 2,
                 {
                     widget = wibox.widget.textbox,
                     text = "Previous wallpaper",
@@ -223,7 +223,7 @@ awful.screen.connect_for_each_screen(function(s)
             spacing = 10,
             {
                 widget = wibox.container.margin,
-                margins = { left = 38 },
+                margins = { left = 36 },
                 {
                     widget = wibox.widget.textbox,
                     text = "Next wallpaper",
