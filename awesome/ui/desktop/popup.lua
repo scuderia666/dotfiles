@@ -2,7 +2,7 @@ local awful = require("awful")
 local wibox = require("wibox")
 local beautiful = require("beautiful")
 local inspect = require('modules.inspect')
-local helpers = require("helpers2")
+local helpers = require("modules.helpers")
 
 local popup = {}
 

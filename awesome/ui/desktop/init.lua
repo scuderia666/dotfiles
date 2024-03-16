@@ -4,7 +4,7 @@ local wibox = require("wibox")
 local gears = require("gears")
 local filesystem = require("gears.filesystem")
 
-local helpers = require("helpers2")
+local helpers = require("modules.helpers")
 local popup = require("ui.desktop.popup")
 local json = require("modules.json")
 local rubato = require("modules.rubato")

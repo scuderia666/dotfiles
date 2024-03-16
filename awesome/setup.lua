@@ -1,5 +1,5 @@
 local json = require("modules.json")
-local helpers = require("helpers2")
+local helpers = require("modules.helpers")
 local gfs = require("gears.filesystem")
 
 local M = {}
