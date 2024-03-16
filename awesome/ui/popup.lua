@@ -16,12 +16,12 @@ local make_button = function(image, func)
         shape = helpers.rrect(16),
         forced_width = 50,
         forced_height = 50,
-        bg = beautiful.bg_3,
+        bg = beautiful.base,
         {
             widget = wibox.container.place,
             {
                 widget = wibox.widget.imagebox,
-                image = beautiful.images .. "/" .. image,
+                image = beautiful.images .. image,
             },
         },
         buttons = {
@@ -52,7 +52,7 @@ awful.screen.connect_for_each_screen(function(s)
         height = height,
         x = screen_width - width,
         y = screen_height/3,
-        bg = beautiful.lbg,
+        bg = beautiful.base,
         ontop = true,
         visible = false,
     })
@@ -64,7 +64,7 @@ awful.screen.connect_for_each_screen(function(s)
         height = height,
         x = screen_width - width,
         y = screen_height/3,
-        bg = beautiful.bg,
+        bg = beautiful.base,
         ontop = true,
         visible = false,
     })
@@ -109,7 +109,7 @@ awful.screen.connect_for_each_screen(function(s)
         widget = wibox.container.background,
         {
             widget = wibox.widget.imagebox,
-            image = beautiful.images .. "/plus.svg"
+            image = beautiful.images .. "plus.svg"
         },
 
         buttons = {
@@ -124,7 +124,7 @@ awful.screen.connect_for_each_screen(function(s)
         widget = wibox.container.background,
         {
             widget = wibox.widget.imagebox,
-            image = beautiful.images .. "/close.svg"
+            image = beautiful.images .. "close.svg"
         },
         buttons = {
             awful.button({}, 1, function()

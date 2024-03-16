@@ -37,13 +37,8 @@ return function(s)
     local indicator = require("ui.indicator.indicator")("volume", s, themes[theme])
 
     local update_slider = function()
-        awful.spawn.easy_async_with_shell(
-            "amixer sget Master | awk -F'[][]' '/Right:|Mono:/ && NF > 1 {sub(/%/, \"\"); printf \"%0.0f\", $2}'",
-            function(stdout)
-                local val = string.gsub(stdout, "^%s*(.-)%s*$", "%1")
-                indicator.update(tonumber(val))
-            end
-        )
+        local value = volume.get_volume()
+        indicator.update(tonumber(value))
     end
 
     update_slider()
@@ -51,7 +46,7 @@ return function(s)
     awesome.connect_signal("update::volume", function()
         update_slider()
     end)
-    
+
     awesome.connect_signal("set::volume", function(value)
         volume.set_volume(value)
     end)

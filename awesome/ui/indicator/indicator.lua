@@ -36,6 +36,7 @@ return function(name, s, args)
 
     local indicator = wibox({
         shape = helpers.rrect(46),
+        type = "popup",
         screen = s,
         width = width,
         height = height,
@@ -56,7 +57,7 @@ return function(name, s, args)
 
     local icon = wibox.widget {
         widget = wibox.widget.imagebox,
-        image = beautiful.images .. "/" .. args.icon,
+        --image = beautiful.images  .. args.icon,
         align = "center",
         valign = "top",
     }
@@ -95,7 +96,7 @@ return function(name, s, args)
         }
     }
 
-    local timer_die = timer { timeout = 3 }
+    local timer_die = gears.timer { timeout = 3 }
 
     slider:connect_signal("mouse::enter", function()
         timer_die:stop()
@@ -142,7 +143,7 @@ return function(name, s, args)
         value = val
         occupy.top = 160 - 160/ratio
         icon.top = 180 - 160/ratio
-        awesome.emit_signal("set::" .. name, value)
+        --awesome.emit_signal("set::" .. name, value)
     end
 
     slider:buttons {

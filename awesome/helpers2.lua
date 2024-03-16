@@ -188,7 +188,7 @@ end
 
 function helpers.randomColor()
   local accents = {
-    beautiful.magenta,
+    beautiful.mauve,
     beautiful.yellow,
     beautiful.green,
     beautiful.red,

@@ -24,8 +24,8 @@ return function(s)
     local indicator = require("ui.indicator.indicator")("brightness", s, args)
 
     local update_slider = function()
-        local val = string.gsub("100", "^%s*(.-)%s*$", "%1")
-        indicator.update(tonumber(val) * 100)
+        local value = brightness.get_brightness()
+        indicator.update(tonumber(value))
     end
 
     update_slider()
@@ -35,7 +35,7 @@ return function(s)
     end)
 
     awesome.connect_signal("set::brightness", function(value)
-        brightness.set_brightness(value/100)
+        brightness.set_brightness(value)
     end)
     
     return indicator

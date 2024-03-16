@@ -7,13 +7,20 @@ local filesystem = require("gears.filesystem")
 local helpers = require("helpers2")
 local popup = require("ui.desktop.popup")
 local json = require("modules.json")
+local rubato = require("modules.rubato")
 
-local data = helpers.readJson(gears.filesystem.get_cache_dir() .. "json/settings.json")
+local data = helpers.readJson(gears.filesystem.get_cache_dir() .. "settings.json")
 local inspect = require("modules.inspect")
 local dpi = beautiful.xresources.apply_dpi
 
-local appicons = "/home/satou/.local/share/icons/Reversal-black-dark/"
-local foldericons = "/home/satou/.local/share/icons/Reversal-black-dark/places/48/"
+local desktop_file = gears.filesystem.get_cache_dir() .. "desktop.json"
+
+local icon_path = "/home/satou/.local/share/icons/Papirus/48x48/"
+local mime_path = icon_path .. "mimetypes/"
+local places_path = icon_path .. "places/"
+
+--local appicons = helpers.readJson(gears.filesystem.get_cache_dir() .. "settings.json").iconTheme .. "/"
+--local foldericons =  helpers.readJson(gears.filesystem.get_cache_dir() .. "settings.json").iconTheme .."/places/48"
 
 local grid = wibox.widget {
   forced_num_rows = 8,
@@ -46,9 +53,10 @@ local icons = {
 }
 
 local desktopdisplay = wibox {
-  visible = data.showDesktopIcons,
+  visible = true,
+  screen = s,
   ontop = false,
-  bg = beautiful.bg .. "00",
+  bg = beautiful.base .. "00",
   type = "desktop",
   widget = wibox.widget {
     {
@@ -96,10 +104,10 @@ function draw_selector()
   if not mousegrabber.isrunning() then
     local selector = wibox.widget {
       widget = wibox.container.background,
-      bg = beautiful.red,
+      bg = beautiful.overlay0,
       opacity = 0.4,
-      border_color = beautiful.red,
-      border_width = dpi(2),
+      --border_color = "#8f083d",
+      --border_width = dpi(4),
       forced_width = 0,
       forced_height = 0,
       x = start_pos.x - mouse.screen.geometry.x,
@@ -114,8 +122,20 @@ function draw_selector()
       end
       if not m.buttons[1] then
         mousegrabber.stop()
-        selector.visible = false
-        manual:reset()
+        timed = rubato.timed {
+            intro = 0.1,
+            duration = 0.3,
+            easing = rubato.quadratic,
+            pos = 0.4,
+            subscribed = function(val)
+                selector.opacity = val
+                if val == 0 then
+                  selector.visible = false
+                  manual:reset()
+                end
+            end
+        }
+        timed.target = 0
       end
       local dx = m.x - start_pos.x
       local dy = m.y - start_pos.y
@@ -149,12 +169,12 @@ local function gen()
   local entries = {}
 
   table.insert(entries,
-    { icon = appicons .. "places/48/trash-empty.svg", label = "Trash", exec = "thunar trash:/", type = "general" })
+    { icon = places_path .. "trashcan_empty.svg", label = "Trash", exec = "thunar trash:/", type = "general" })
 
   for entry in io.popen([[ls ~/Desktop | sed '']]):lines() do
     local label = entry
     local exec = nil
-    local icon = appicons .. "mimes/48/text-x-generic.svg"
+    local icon = mime_path .. "text-x-generic.svg"
     local ext = label:match("^.+(%..+)$")
 
     if ext == ".desktop" then
@@ -169,33 +189,33 @@ local function gen()
         if line:match("CustomIcon=") then
           icon = line:gsub("CustomIcon=", "")
         elseif line:match("Icon=") then
-            icon = appicons .. "apps/" .. line:gsub("Icon=", "") .. ".svg"
+            icon = icon_path .. "apps/" .. line:gsub("Icon=", "") .. ".svg"
         end
       end
       table.insert(entries, { icon = icon, label = label, exec = exec, type = "shortcut" })
     elseif os.execute("cd ~/Desktop/" .. entry) then
-      icon = foldericons .. "/folder.svg"
+      icon = places_path .. "folder.svg"
       exec = "thunar ~/Desktop/" .. entry
       table.insert(entries, { icon = icon, label = label, exec = exec, type = "folder" })
     elseif os.execute("wc -c < ~/Desktop/" .. entry) then
-      icon = appicons .. "mimes/48/application-x-zerosize.svg"
+      icon = mime_path .. "application-x-zerosize.svg"
       exec = "geany ~/Desktop/" .. entry
       if string.match(entry, "%.") then
         local extension = helpers.split(entry, ".")
         extension = extension[#extension]
         if extension == "jpg" or extension == "jpeg" or extension == "tiff" or extension == "png" or extension == "webp" or extension == "svg" then
           if extension == "jpg" then
-            icon = appicons .. "mimes/48/jpg.svg"
+            icon = mime_path .. "image-jpeg.svg"
           else
-            icon = appicons .. "mimes/48/image-" .. extension .. ".svg"
+            icon = mime_path .. "image-" .. extension .. ".svg"
           end
           exec = "feh ~/Desktop/" .. entry
         elseif extension == "mp4" or extension == "avif" or extension == "webm" or extension == "mkv" or extension == "mov" then
-          icon = appicons .. "mimes/48/media-video.svg"
+          icon = mime_path .. "media-video.svg"
         elseif extension == "mp3" or extension == "wav" or extension == "flac" or extension == "aiff" then
-          icon = appicons .. "mimes/48/media-audio.svg"
+          icon = mime_path .. "media-audio.svg"
         elseif icons[extension] ~= nil then
-          icon = appicons .. "mimes/48/text-x-" .. icons[extension] .. ".svg"
+          icon = mime_path .. "text-x-" .. icons[extension] .. ".svg"
         end
       end
       table.insert(entries, { icon = icon, label = label, exec = exec, type = "file" })
@@ -225,7 +245,7 @@ local function save()
     }
   end
 
-  local w = assert(io.open(".cache/awesome/json/desktop.json", "w"))
+  local w = assert(io.open(desktop_file, "w"))
   w:write(json.encode(layout, nil, { pretty = true, indent = "	", align_keys = false, array_newline = true }))
   w:close()
 end
@@ -247,7 +267,7 @@ local function createicon(icon, label, exec, ty)
       {
         {
           {
-            markup = helpers.colorizeText(label, beautiful.fg),
+            markup = helpers.colorizeText(label, beautiful.text),
             valign = "top",
             font = "terminuss 11",
             align = "center",
@@ -357,7 +377,7 @@ local function createicon(icon, label, exec, ty)
                 grid:add_widget_at(widget, newrow, newcol)
                 save()
               else
-                local d = helpers.readJson(gears.filesystem.get_cache_dir() .. "json/desktop.json")
+                local d = helpers.readJson(desktop_file)
                 local elem
                 for _, j in ipairs(d) do
                   if j.row == newrow and j.col == newcol then
@@ -397,14 +417,21 @@ local function createicon(icon, label, exec, ty)
 end
 
 local function load()
-  local layoutfile = gears.filesystem.get_cache_dir() .. "json/desktop.json"
-  if not gears.filesystem.file_readable(layoutfile) then
+  if not gears.filesystem.file_readable(desktop_file) then
     local entries = gen()
     for _, entry in ipairs(entries) do
       grid:add(createicon(entry.icon, entry.label, entry.exec, entry.type))
     end
     save()
-    return
+  else
+    local r = assert(io.open(desktop_file, "rb"))
+    local t = r:read("*all")
+    r:close()
+
+    local layout = json.decode(t)
+    for _, entry in ipairs(layout) do
+      grid:add_widget_at(createicon(entry.widget.icon, entry.widget.label, entry.widget.exec, entry.type), entry.row, entry.col)
+    end
   end
 
   local awmmenu = {
@@ -440,27 +467,13 @@ local function load()
     awful.button({}, 1, function()
       awesome.emit_signal("iconmenu::hide")
       awesome.emit_signal("close::menu")
-      if mouse.current_widgets[4] == manual then
-        draw_selector()
-      end
+      draw_selector()
     end),
     awful.button({}, 3, function()
-      if mouse.current_widgets[4] == manual then
-        awesome.emit_signal("iconmenu::hide")
-        awesome.emit_signal("toggle::menu")
-      end
+      awesome.emit_signal("iconmenu::hide")
+      awesome.emit_signal("toggle::menu")
     end)
   }
-
-  local r = assert(io.open(".cache/awesome/json/desktop.json", "rb"))
-  local t = r:read("*all")
-  r:close()
-  local layout = json.decode(t)
-
-  for _, entry in ipairs(layout) do
-    grid:add_widget_at(createicon(entry.widget.icon, entry.widget.label, entry.widget.exec, entry.type), entry.row,
-      entry.col)
-  end
 end
 
 load()
@@ -513,4 +526,5 @@ awful.spawn.easy_async_with_shell(
         awesome.emit_signal("signal::desktop")
       end
     })
-  end)
+  end
+)

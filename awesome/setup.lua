@@ -8,17 +8,16 @@ M.defaultData = {
   colorscheme = "cat",
   gaps = 10,
   terminal = "alacritty",
-  browser = "floorp",
-  file_manager = "thunar",
+  browser = "waterfox",
+  file_manager = "Thunar",
   poweroff_cmd = "doas poweroff",
   reboot_cmd = "doas reboot",
-  iconTheme = "~/.local/share/icons/hicolor/",
-  showDesktopIcons = true,
+  iconTheme = "~/.local/share/icons/Reversal-black-dark/",
   pfp = "/home/" .. string.gsub(os.getenv('USER'), '^%l', string.lower) .. "/.config/awesome/theme/assets/pfp.png",
   wallpaper = "colorful",
 }
 
-M.path = gfs.get_cache_dir() .. "json/settings.json"
+M.path = gfs.get_cache_dir() .. "settings.json"
 
 function M:generate()
   if not helpers.file_exists(self.path) then

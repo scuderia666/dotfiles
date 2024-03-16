@@ -38,25 +38,23 @@ awful.screen.connect_for_each_screen(function(s)
         screen = s,
 		position = "bottom",
 		type = "dock",
-        margins = { right = 12, left = 12, bottom = 8 },
 		ontop = true,
 		visible = true,
 		height = dpi(36),
-        width = s.geometry.width - 18,
-        shape = helpers.rrect(12),
-        bg = beautiful.bg,
+        width = s.geometry.width,
+        bg = beautiful.crust,
 	})
 
     local menu = wibox.widget {
         widget = wibox.container.background,
-        --bg = beautiful.bg,
+        --bg = beautiful.base,
         --shape = helpers.rrect(8),
         {
             widget = wibox.container.margin,
             margins = dpi(10),
             {
                 widget = wibox.widget.imagebox,
-                image = beautiful.images .. "/void.svg",
+                image = beautiful.images .. "void.svg",
             },
         },
         buttons = {
@@ -65,94 +63,6 @@ awful.screen.connect_for_each_screen(function(s)
             end)
         },
     }
-
-    local tasklist = awful.widget.tasklist({
-        screen = s,
-        filter = awful.widget.tasklist.filter.currenttags,
-        layout = {
-            layout = wibox.layout.flex.horizontal
-        },
-        buttons = tasklist_buttons,
-        style = {
-            font = beautiful.font,
-            bg_normal = beautiful.bg3,
-            bg_focus = beautiful.fg,
-            bg_minimize = beautiful.bg2,
-            shape = helpers.rrect(8)
-        },
-        widget_template = {
-            widget = wibox.container.margin,
-            margins = 4,
-            {
-                layout = wibox.layout.stack,
-                {
-                    widget = wibox.container.background,
-                    bg = beautiful.bg,
-                },
-                {
-                    widget = wibox.container.background,
-                    id = "pointer",
-                    bg = beautiful.bg,
-                    shape = gears.shape.circle,
-                    shape_border_color = beautiful.red,
-                    shape_border_width = 2,
-                },
-                {
-                    widget = wibox.container.margin,
-                    margins = 8,
-                    awful.widget.clienticon,
-                },
-            },
-            
-            update_callback = function(self, c, _, __)
-                collectgarbage("collect")
-
-                if c.active then
-                    self:get_children_by_id("pointer")[1].shape_border_color = beautiful.red
-                elseif c.minimized then
-                    self:get_children_by_id("pointer")[1].shape_border_color = beautiful.bg
-                else
-                    self:get_children_by_id("pointer")[1].shape_border_color = beautiful.ylw
-                end
-            end,
-        },
-        widget_templatee = {
-            widget = wibox.container.background,
-            bg = beautiful.bg2,
-            {
-                layout = wibox.layout.stack,
-                {
-                    widget = wibox.container.margin,
-                    margins = dpi(10),
-                    awful.widget.clienticon
-                },
-                {
-                    widget = wibox.container.margin,
-                    margins = { top = 44 },
-                    {
-                        widget = wibox.container.background,
-                        id = "pointer",
-                        bg = beautiful.fg,
-                        shape = gears.shape.rounded_bar,
-                        forced_height = dpi(0),
-                        forced_width = dpi(20)
-                    },
-                },
-            },
-            
-            update_callback = function(self, c, _, __)
-                collectgarbage("collect")
-
-                if c.active then
-                    self:get_children_by_id("pointer")[1].bg = beautiful.fg
-                elseif c.minimized then
-                    self:get_children_by_id("pointer")[1].bg = beautiful.red
-                else
-                    self:get_children_by_id("pointer")[1].bg = beautiful.bg3
-                end
-            end,
-        },
-    })
 
     local task = awful.widget.tasklist {
 		screen = s,
@@ -309,7 +219,7 @@ awful.screen.connect_for_each_screen(function(s)
 
     local clock = wibox.widget {
         widget = wibox.widget.textclock,
-        format = helpers.colorizeText("%I : %M", beautiful.fg),
+        format = helpers.colorizeText("%I : %M", "#cdd6f4"),
         font = "Roboto 11",
         align = "center",
         valign = "center",
@@ -323,6 +233,44 @@ awful.screen.connect_for_each_screen(function(s)
             awful.button({}, 4, function() awful.layout.inc(-1) end),
             awful.button({}, 5, function() awful.layout.inc(1) end),
         }
+    }
+    
+    local showdesktop = wibox.widget {
+        widget = wibox.container.background,
+        bg = beautiful.base,
+        forced_width = 12,
+        forced_height = 4,
+        buttons = {
+            awful.button({}, 1, function()
+                for _, c in ipairs(client.get()) do
+                    c.minimized = not c.minimized
+                end
+            end)
+        },
+    }
+
+    local seperator = wibox.widget {
+        widget = wibox.container.background,
+        bg = beautiful.surface2,
+        forced_width = 1,
+    }
+
+    local volume = wibox.widget {
+        widget = wibox.widget.imagebox,
+        image = beautiful.images .. "volume.svg",
+        buttons = {
+            awful.button({}, 4, function(t) volume_module.volume_up() end),
+            awful.button({}, 5, function(t) volume_module.volume_down() end)
+        },
+    }
+    
+    local brightness = wibox.widget {
+        widget = wibox.widget.imagebox,
+        image = beautiful.images .. "brightness.svg",
+        buttons = {
+            awful.button({}, 4, function(t) brightness_module.brightness_up() end),
+            awful.button({}, 5, function(t) brightness_module.brightness_down() end)
+        },
     }
 
     s.bar:setup {
@@ -341,111 +289,20 @@ awful.screen.connect_for_each_screen(function(s)
             layout = wibox.container.place,
         },
         {
-            layout = wibox.layout.fixed.horizontal,
-            {
-                widget = wibox.container.margin,
-                margins = dpi(8),
-                {
-                    layout = wibox.layout.fixed.horizontal,
-                    spacing = dpi(6),
-                    require("ui.capslock"),
-                    {
-                        widget = wibox.container.margin,
-                        margins = dpi(2),
-                        {
-                            widget = wibox.widget.imagebox,
-                            image = beautiful.images .. "/volume.svg",
-                            buttons = {
-                                awful.button({}, 4, function(t) volume_module.volume_up() end),
-                                awful.button({}, 5, function(t) volume_module.volume_down() end)
-                            },
-                        },
-                    },
-                    {
-                        widget = wibox.container.margin,
-                        margins = dpi(2),
-                        {
-                            widget = wibox.widget.imagebox,
-                            image = beautiful.images .. "/brightness.svg",
-                            buttons = {
-                                awful.button({}, 4, function(t) brightness_module.brightness_up() end),
-                                awful.button({}, 5, function(t) brightness_module.brightness_down() end)
-                            },
-                        },
-                    },
-                    {
-                        widget = wibox.widget.systray
-                    },
-                    clock,
-                },
-            },
-            {
-                widget = wibox.container.background,
-                bg = beautiful.bg2,
-                forced_width = 12,
-                forced_height = 4,
-                buttons = {
-                    awful.button({}, 1, function()
-                        for _, c in ipairs(client.get()) do
-                            c.minimized = not c.minimized
-                        end
-                    end)
-                },
-            },
-        },
-    }
-
-    --[[s.bar:setup {
-        layout = wibox.layout.align.horizontal,
-        expand = "none",
-        {
-            layout = wibox.layout.fixed.horizontal,
-            {
-                widget = wibox.container.margin,
-                margins = { top = 12, bottom = 12 },
-                taglist
-            },
-        },
-        tasklist,
-        {
             widget = wibox.container.margin,
-            margins = dpi(8),
+            margins = 8,
             {
                 layout = wibox.layout.fixed.horizontal,
                 spacing = dpi(6),
-                {
-                    widget = wibox.widget.systray
-                },
-                clock
+                wibox.widget.systray,
+                seperator,
+                --volume,
+                --brightness,
+                --seperator,
+                clock,
             },
-        },
-    }]]--
-
-    --[[s.bar:setup {
-        layout = wibox.layout.flex.horizontal,
-        expand = "none",
-        {
-            widget = wibox.container.background,
-            bg = beautiful.red,
-            {
-                widget = wibox.container.margin,
-                margins = 6,
-                {
-                    widget = wibox.container.background,
-                    bg = beautiful.bg,
-                    shape = helpers.rrect(12),
-                },
-            },
-        },
-        {
-            widget = wibox.container.background,
-            bg = beautiful.blue,
-        },
-        {
-            widget = wibox.container.background,
-            bg = beautiful.green,
-        },
-    }]]--
+        }
+    }
 
     local function hide_bar(c)
 		if c.fullscreen or c.maximized then

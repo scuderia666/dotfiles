@@ -64,10 +64,10 @@ local function draw_widget(mouse_keys)
 		buttons = mouse_keys,
 		style = {
 			font = beautiful.font_var,
-			bg_normal = beautiful.bg,
-			bg_focus = beautiful.bg3,
-			fg_normal = beautiful.red,
-			fg_focus = beautiful.fg,
+			bg_normal = beautiful.base,
+			bg_focus = beautiful.surface2,
+			fg_normal = beautiful.surface2,
+			fg_focus = beautiful.overlay1,
 			shape = helpers.rrect(beautiful.rounded),
 		},
 		layout = {

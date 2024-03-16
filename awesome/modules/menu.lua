@@ -11,6 +11,8 @@ local capi = { awesome = awesome, mouse = mouse, tag = tag }
 
 local menu = { mt = {} }
 
+local menu_color = beautiful.crust
+
 function menu:set_pos(args)
   args = args or {}
 
@@ -150,7 +152,7 @@ function menu.menu(widgets, width)
     minimum_width = width or dpi(300),
     maximum_width = width or dpi(300),
     shape = helpers.rrect(9),
-    bg = beautiful.main_menu_bg,
+    bg = menu_color,
     widget = wibox.layout.fixed.vertical,
   })
   gtable.crush(widget, menu, true)
@@ -241,9 +243,9 @@ function menu.sub_menu_button(args)
       widget = wibox.container.margin,
       margins = 10
     },
-    bg = beautiful.bg,
+    bg = menu_color,
     forced_height = 48,
-    shape = helpers.rrect(9),
+    --shape = helpers.rrect(9),
     widget = wibox.container.background,
   }
   widget:connect_signal("mouse::enter", function(self)
@@ -301,9 +303,9 @@ function menu.button(args)
       widget = wibox.container.margin,
       margins = 10
     },
-    bg = beautiful.bg,
+    bg = menu_color,
     forced_height = 48,
-    shape = helpers.rrect(9),
+    --shape = helpers.rrect(9),
     buttons = {
       awful.button({}, 1, function()
         args.on_press(menu, text_widget)
@@ -330,7 +332,7 @@ function menu.separator()
       forced_height = dpi(2),
       orientation = "horizontal",
       thickness = dpi(1),
-      color = beautiful.fg .. "29",
+      color = beautiful.surface2 .. "29",
     },
   })
 end

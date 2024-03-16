@@ -11,6 +11,12 @@ local shift = "Shift"
 local ctrl = "Control"
 local alt = "Mod1"
 
+awful.mouse.snap.edge_enabled = false
+awful.mouse.snap.client_enabled = false
+
+local config_dir = filesystem.get_configuration_dir()
+local scripts = config_dir .. "/stuff/scripts/"
+
 awful.keyboard.append_global_keybindings({
 
 	awful.key({ mod }, "Return", function()
@@ -26,7 +32,7 @@ awful.keyboard.append_global_keybindings({
 	end),
     
     awful.key({ mod }, "r", function()
-		awful.spawn(launcher)
+		awful.spawn("sh " .. scripts .. "launcher")
 	end),
     
     awful.key({ mod }, "l", function()
@@ -50,19 +56,19 @@ awful.keyboard.append_global_keybindings({
     end),
 
     awful.key({}, "XF86AudioRaiseVolume", function()
-        brightness.volume_up()
+        volume.volume_up()
     end),
 
     awful.key({}, "XF86AudioLowerVolume", function()
-        brightness.volume_down()
+        volume.volume_down()
     end),
     
     awful.key({}, "Print", function()
-        awful.util.spawn_with_shell("bash " .. filesystem.get_configuration_dir() .. "/scripts/monitorshot.sh")
+        awful.util.spawn_with_shell("bash " .. scripts .. "monitorshot.sh")
     end),
     
     awful.key({ctrl}, "Print", function()
-        awful.util.spawn_with_shell("bash " .. filesystem.get_configuration_dir() .. "/scripts/monitorshot.sh clipboard")
+        awful.util.spawn_with_shell("bash " .. scripts .. "monitorshot.sh clipboard")
     end),
     
     awful.key({alt}, "Print", function()
@@ -140,6 +146,8 @@ client.connect_signal("request::default_keybindings", function()
         end),
 
         awful.key({ mod }, "x", awful.client.floating.toggle),
+        --awful.key({ mod }, "x", awful.placement.centered),
+        --awful.key({ mod }, "x", awful.placement.centered + awful.placement.no_offscreen),
     })
 end)
 
@@ -151,8 +159,6 @@ awful.mouse.append_global_mousebindings({
         return
     end),
 })
-
-awful.keyboard.append_global_keybindings({require("ui.capslock").key})
 
 awful.keyboard.append_global_keybindings({
 	awful.key({ mod }, "Tab", function()

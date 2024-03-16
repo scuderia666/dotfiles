@@ -20,7 +20,7 @@ local filter_bg_image = function(wall_name, ap, width, height)
 	then
 		mkdir -p ]] .. tmp_dir .. [[;
 	fi
-	convert -quality 100 -brightness-contrast -20x0 ]] .. ' '  .. blur_filter_param .. ' '.. beautiful.images .. "/" .. wall_name .. 
+	convert -quality 100 -brightness-contrast -20x0 ]] .. ' '  .. blur_filter_param .. ' '.. beautiful.images .. wall_name .. 
 	[[ -gravity center -crop ]] .. ap .. [[:1 +repage -resize ]] .. width .. 'x' .. height .. 
 	[[! ]] .. tmp_dir .. wall_name .. [[
 	"]]
@@ -43,7 +43,6 @@ awful.screen.connect_for_each_screen(function(s)
         height = screen_height,
         ontop = true,
         visible = false,
-        bgimage = beautiful.images .. "/lockscreen.png"
     })
 
     --[[awful.spawn.easy_async_with_shell(
@@ -111,7 +110,7 @@ awful.screen.connect_for_each_screen(function(s)
 
         characters_entered = characters_entered + 1
         
-        promptbox.markup = helpers.colorizeText(string.rep("*", characters_entered), beautiful.fg)
+        promptbox.markup = helpers.colorizeText(string.rep("*", characters_entered), beautiful.text)
     end
     
     local reset = function()
@@ -162,7 +161,7 @@ awful.screen.connect_for_each_screen(function(s)
                     
             characters_entered = characters_entered - 1
 
-            promptbox.markup = helpers.colorizeText(string.rep("*", characters_entered), beautiful.fg)
+            promptbox.markup = helpers.colorizeText(string.rep("*", characters_entered), beautiful.text)
         end
     end
 
@@ -181,8 +180,8 @@ awful.screen.connect_for_each_screen(function(s)
         local transition = helpers.apply_transition {
             element = widget,
             prop    = 'bg',
-            bg      = beautiful.bg,
-            hbg     = beautiful.accent,
+            bg      = beautiful.base,
+            hbg     = beautiful.surface1,
             duration = 0.15,
         }
 
@@ -249,8 +248,8 @@ awful.screen.connect_for_each_screen(function(s)
         },
     }
     
-    helpers.add_hover(backspace_widget, beautiful.bg, beautiful.bg2)
-    helpers.add_hover(send_widget, beautiful.bg, beautiful.bg2)
+    helpers.add_hover(backspace_widget, beautiful.base, beautiful.surface1)
+    helpers.add_hover(send_widget, beautiful.base, beautiful.surface1)
 
     local buttons = wibox.layout {
         layout = wibox.layout.flex.vertical,
@@ -287,16 +286,15 @@ awful.screen.connect_for_each_screen(function(s)
     local clock_format = '<span font="Inter Bold 52">%H:%M</span>'
 
     local time = wibox.widget.textclock(clock_format, 1)
-    
-    local test_bg = function(color)
-        return wibox.widget {
-            widget = wibox.widget.background,
-            bg = color
-        }
-    end
-    
+
     lockscreen:setup {
         layout = wibox.layout.stack,
+        {
+            widget = wibox.widget.imagebox,
+            image = beautiful.images .. "lockscreen.png",
+            horizontal_fit_policy = "fit",
+            vertical_fit_policy = "fit",
+        },
         {
             widget = wibox.container.margin,
             margins = { right = 400, left = 400 },
@@ -317,7 +315,7 @@ awful.screen.connect_for_each_screen(function(s)
                     {
                         widget = wibox.container.background,
                         shape = helpers.rrect(32),
-                        bg = beautiful.bg3,
+                        bg = beautiful.base,
                         opacity = 0.6,
                         promptbox,
                     },

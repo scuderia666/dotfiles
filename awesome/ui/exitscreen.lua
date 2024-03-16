@@ -86,11 +86,11 @@ end
 
 
 
-local poweroffbutton = createButton(powerofficon, poweroffcommand, beautiful.err)
-local rebootbutton = createButton(rebooticon, rebootcommand, beautiful.pri)
-local lockbutton = createButton(lockicon, lockcommand, beautiful.dis)
-local suspendbutton = createButton(suspendicon, suspendcommand, beautiful.warn)
-local exitbutton = createButton(exiticon, exitcommand, beautiful.ok)
+local poweroffbutton = createButton(powerofficon, poweroffcommand, beautiful.red)
+local rebootbutton = createButton(rebooticon, rebootcommand, beautiful.green)
+local lockbutton = createButton(lockicon, lockcommand, beautiful.peach)
+local suspendbutton = createButton(suspendicon, suspendcommand, beautiful.yellow)
+local exitbutton = createButton(exiticon, exitcommand, beautiful.red)
 
 
 local box = wibox.widget {
@@ -137,7 +137,7 @@ awful.screen.connect_for_each_screen(function(s)
     screen = s,
     width = beautiful.scrwidth,
     height = beautiful.scrheight,
-    bg = beautiful.bg .. '44',
+    bg = beautiful.base .. '44',
     ontop = true,
     visible = false,
   })

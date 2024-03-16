@@ -1,9 +1,3 @@
-------------------------
--- Client Decorations --
-------------------------
-
--- Imports
-----------
 local awful     = require('awful')
 local wibox     = require('wibox')
 local gears     = require('gears')
@@ -12,10 +6,8 @@ local dpi       = beautiful.xresources.apply_dpi
 
 local helpers   = require('modules.helpers')
 
-local title_size = 24
+local title_size = 26
 
--- Buttons
-----------
 local mkbutton = function (width, color, onclick)
   return function(c)
     local button = wibox.widget {
@@ -31,7 +23,7 @@ local mkbutton = function (width, color, onclick)
       element   = button,
       prop      = 'bg',
       bg        = color,
-      hbg       = beautiful.blk,
+      hbg       = beautiful.surface2,
     }
 
     client.connect_signal("property::active", function ()
@@ -64,8 +56,6 @@ local sticky = mkbutton(title_size * 3/4, beautiful.green, function(c)
     c.sticky = not c.sticky
 end)
 
--- Titlebars
-------------
 -- Add a titlebar if titlebars_enabled is set to true in the rules.
 client.connect_signal("request::titlebars", function(c)
 
@@ -114,60 +104,16 @@ client.connect_signal("request::titlebars", function(c)
     
     local title = wibox.widget {
         widget = awful.titlebar.widget.titlewidget(c),
-        font = "terminuss 12",
         align = "center"
     }
 
     titlebar.widget = {
         layout = wibox.layout.stack,
-        {
-            layout = wibox.layout.fixed.horizontal,
-            buttons = buttons,
-        },
+        buttons = buttons,
         {
             layout = wibox.layout.align.horizontal,
-            expand = "none",
             title_buttons,
-            title,
+            --title,
         }
     }
-
-    --[[titlebar.widget = {
-        {
-            {
-                {
-                  close(c),
-                  direction = "north",
-                  widget    = wibox.container.rotate
-                },
-                {
-                  maximize(c),
-                  direction = "north",
-                  widget    = wibox.container.rotate
-                },
-                {
-                  sticky(c),
-                  direction = "north",
-                  widget    = wibox.container.rotate
-                },
-                spacing = dpi(title_size / 4),
-                layout  = wibox.layout.fixed.horizontal
-            },
-            {
-                buttons = buttons,
-                layout  = wibox.layout.fixed.horizontal
-            },
-            {
-                buttons = buttons,
-                layout  = wibox.layout.fixed.horizontal
-            },
-            spacing = dpi(title_size / 4),
-            layout  = wibox.layout.align.horizontal
-        },
-        top     = dpi(title_size / 3),
-        bottom  = dpi(title_size / 3),
-        left    = dpi(title_size / 3),
-        right   = dpi(title_size / 2),
-        widget  = wibox.container.margin
-    }]]--
 end)

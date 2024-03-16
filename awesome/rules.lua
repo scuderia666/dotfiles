@@ -10,10 +10,18 @@ ruled.client.connect_signal("request::rules", function()
         properties = {
             focus = awful.client.focus.filter,
             raise = true,
-            floating = false,
+            floating = true,
             screen = awful.screen.preferred,
-            placement = awful.placement.no_overlap + awful.placement.no_offscreen,
+            placement = awful.placement.centered + awful.placement.no_offscreen,
         }
+    }
+    
+    ruled.client.append_rule {
+        rule_any = {
+            class = { "discord", "Waterfox" },
+            name = { "Discord", "Waterfox" },
+        },
+        properties = { floating = false }
     }
 
     ruled.client.append_rule {

@@ -1,9 +1,11 @@
 local awful = require("awful")
 local filesystem = require("gears.filesystem")
 
-local script = filesystem.get_configuration_dir() .. "/scripts/brightness.sh"
+local script = filesystem.get_configuration_dir() .. "/stuff/scripts/brightness.sh"
 
 local brightness = {}
+
+brightness_temp = 0
 
 brightness.get_monitor = function(monitor)
     if monitor ~= nil then
@@ -24,22 +26,28 @@ brightness.get_brightness = function(monitor)
     return brightness_temp
 end
 
-brightness.brightness_up = function(monitor)
+brightness.brightness_up = function(monitor, update)
     awful.spawn("bash " .. script .. " + " .. brightness.get_monitor(monitor), false)
 
-    --awesome.emit_signal("update::brightness")
+    if update ~= false then
+        awesome.emit_signal("update::brightness")
+    end
 end
 
-brightness.brightness_down = function(monitor)
+brightness.brightness_down = function(monitor, update)
     awful.spawn("bash " .. script .. " - " .. brightness.get_monitor(monitor), false)
 
-    --awesome.emit_signal("update::brightness")
+    if update ~= false then
+        awesome.emit_signal("update::brightness")
+    end
 end
 
-brightness.set_brightness = function(value, monitor)
+brightness.set_brightness = function(value, monitor, update)
     awful.spawn("bash " .. script .. " " .. value .. " " .. brightness.get_monitor(monitor), false)
 
-    --awesome.emit_signal("update::brightness")
+    if update ~= false then
+        awesome.emit_signal("update::brightness")
+    end
 end
 
 brightness.show_indicator = function()

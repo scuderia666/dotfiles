@@ -15,14 +15,14 @@ awful.screen.connect_for_each_screen(function(s)
     local screen_height = s.geometry.height
 
     local menu = wibox({
-        type = "dock",
-        shape = helpers.rrect(16),
+        type = "menu",
+        --shape = helpers.rrect(16),
         screen = s,
         width = dpi(480),
-        height = dpi(400),
+        height = dpi(328),
         x = 8,
-        y = screen_height - 452,
-        bg = beautiful.bg3,
+        y = screen_height - 328 - 36 - 4,
+        bg = beautiful.base,
         ontop = true,
         visible = false,
     })
@@ -33,7 +33,7 @@ awful.screen.connect_for_each_screen(function(s)
         align = "center",
         {
             widget = wibox.widget.imagebox,
-            image = beautiful.images .. "/profile.jpg",
+            image = beautiful.images .. "profile.jpg",
         },
     }
 
@@ -55,6 +55,16 @@ awful.screen.connect_for_each_screen(function(s)
         },
     }
 
+    --[[local slider = wibox.widget.slider() -- ...or any other valid way to create the slider object
+    function slider:set_value_direct(value)
+        value = math.min(math.max(value, self:get_minimum()), self:get_maximum())
+        if value ~= self._private.value then
+            self._private.value = value
+            self:emit_signal("property::value", value, true) -- Pass an additional `true` value to the callback
+            self:emit_signal("widget::redraw_needed")
+        end
+    end]]--
+
     local brightness_slider = wibox.widget {
         widget = wibox.widget.slider,
         value = 0,
@@ -63,14 +73,14 @@ awful.screen.connect_for_each_screen(function(s)
         forced_height = dpi(40),
         shape = gears.shape.rounded_bar,
         bar_shape = gears.shape.rounded_bar,
-        bar_color = beautiful.bg4,
+        bar_color = beautiful.surface1,
         bar_margins = {bottom = dpi(18) ,top = dpi(18)},
-        bar_active_color = beautiful.bg,
+        bar_active_color = beautiful.crust,
         handle_width = dpi(14),
         handle_shape = gears.shape.circle,
-        handle_color = beautiful.red,
-        handle_border_width = 3,
-        handle_border_color = beautiful.bg3
+        handle_color = beautiful.green,
+        handle_border_width = 0,
+        handle_border_color = beautiful.surface2
     }
 
     local volume_slider = wibox.widget {
@@ -81,33 +91,33 @@ awful.screen.connect_for_each_screen(function(s)
         forced_height = dpi(40),
         shape = gears.shape.rounded_bar,
         bar_shape = gears.shape.rounded_bar,
-        bar_color = beautiful.bg4,
+        bar_color = beautiful.surface1,
         bar_margins = {bottom = dpi(18) ,top = dpi(18)},
-        bar_active_color = beautiful.bg,
+        bar_active_color = beautiful.crust,
         handle_width = dpi(14),
         handle_shape = gears.shape.circle,
-        handle_color = beautiful.red,
-        handle_border_width = 3,
-        handle_border_color = beautiful.bg3
+        handle_color = beautiful.green,
+        handle_border_width = 0,
+        handle_border_color = beautiful.surface2
     }
 
     local brightness_icon = {
         widget = wibox.widget.imagebox,
-        image = beautiful.images .. "/brightness.svg",
+        image = beautiful.images .. "brightness.svg",
         forced_width = 30,
         forced_height = 30,
     }
     
     local volume_icon = {
         widget = wibox.widget.imagebox,
-        image = beautiful.images .. "/volume.svg",
+        image = beautiful.images .. "volume.svg",
         forced_width = 30,
         forced_height = 30,
     }
 
     local brightness_text = wibox.widget{
         widget = wibox.widget.textbox,
-        markup = helpers.colorizeText("0%", beautiful.fg),
+        markup = helpers.colorizeText("0%", beautiful.text),
         font = "Roboto 10",
         align = "center",
         valign = "center"
@@ -115,7 +125,7 @@ awful.screen.connect_for_each_screen(function(s)
     
     local volume_text = wibox.widget{
         widget = wibox.widget.textbox,
-        markup = helpers.colorizeText("0%", beautiful.fg),
+        markup = helpers.colorizeText("0%", beautiful.text),
         font = "Roboto 10",
         align = "center",
         valign = "center"
@@ -150,7 +160,6 @@ awful.screen.connect_for_each_screen(function(s)
     
     local previous_wallpaper = wibox.widget {
         widget = wibox.container.background,
-        bg = beautiful.bg,
         shape = helpers.rrect(6),
         forced_width = 40,
         forced_height = 40,
@@ -159,7 +168,7 @@ awful.screen.connect_for_each_screen(function(s)
             spacing = 10,
             {
                 widget = wibox.widget.imagebox,
-                image = beautiful.images .. "/previous.png"
+                image = beautiful.images .. "previous.png"
             },
             {
                 widget = wibox.container.margin,
@@ -181,9 +190,31 @@ awful.screen.connect_for_each_screen(function(s)
         },
     }
 
+    local refresh_icon = wibox.widget{
+        widget = wibox.widget.textbox,
+        markup = helpers.colorizeText("⟳", beautiful.text),
+        font = "Roboto 18",
+        align = "center",
+        valign = "center"
+    }
+
+    local refresh_wallpaper = wibox.widget {
+        widget = wibox.container.background,
+        shape = helpers.rrect(6),
+        forced_width = 40,
+        forced_height = 40,
+        refresh_icon,
+        buttons = {
+            awful.button({}, 1, function()
+                minimize()
+                awesome.emit_signal("wallpaper::refresh")
+                end
+            ),
+        },
+    }
+
     local next_wallpaper = wibox.widget {
         widget = wibox.container.background,
-        bg = beautiful.bg,
         shape = helpers.rrect(6),
         forced_width = 40,
         forced_height = 40,
@@ -202,7 +233,7 @@ awful.screen.connect_for_each_screen(function(s)
             nil,
             {
                 widget = wibox.widget.imagebox,
-                image = beautiful.images .. "/next.png",
+                image = beautiful.images .. "next.png",
             },
         },
         buttons = {
@@ -214,14 +245,41 @@ awful.screen.connect_for_each_screen(function(s)
         },
     }
 
-    helpers.add_hover(previous_wallpaper, beautiful.bg, beautiful.bg_3)
-    helpers.add_hover(next_wallpaper, beautiful.bg, beautiful.bg_3)
+    helpers.add_hover(previous_wallpaper, beautiful.crust, beautiful.surface0)
+    helpers.add_hover(refresh_wallpaper, beautiful.crust, beautiful.surface0)
+    helpers.add_hover(next_wallpaper, beautiful.crust, beautiful.surface0)
+    
+    local poweroff = wibox.widget {
+        widget = wibox.widget.textbox,
+        font = beautiful.icofont .. " 18",
+        align = "center",
+        markup = helpers.colorizeText('󰐥', beautiful.red),
+        buttons = {
+            awful.button({}, 1, function()
+                awesome.emit_signal("popup::show")
+                menu.visible = false
+            end)
+        },
+    }
+    
+    local lock = wibox.widget {
+        widget = wibox.widget.textbox,
+        font = beautiful.icofont .. " 18",
+        align = "center",
+        markup = helpers.colorizeText('', beautiful.blue),
+        buttons = {
+            awful.button({}, 1, function()
+                awesome.emit_signal("lockscreen::show")
+                menu.visible = false
+            end)
+        },
+    }
 
     menu:setup {
         layout = wibox.layout.fixed.vertical,
         {
             widget = wibox.container.background,
-            bg = beautiful.bg,
+            bg = beautiful.crust,
             forced_height = dpi(84),
             {
                 widget = wibox.container.margin,
@@ -240,27 +298,15 @@ awful.screen.connect_for_each_screen(function(s)
                             layout = wibox.layout.align.vertical,
                             spacing = dpi(8),
                             {
-                                widget = wibox.widget.textbox,
-                                font = beautiful.icofont .. " 18",
-                                markup = helpers.colorizeText('󰐥', beautiful.err),
-                                buttons = {
-                                    awful.button({}, 1, function()
-                                        awesome.emit_signal("popup::show")
-                                        menu.visible = false
-                                    end)
-                                },
+                                widget = wibox.container.margin,
+                                margins = dpi(4),
+                                poweroff
                             },
                             {
-                                widget = wibox.widget.textbox,
-                                font = beautiful.icofont .. " 18",
-                                markup = helpers.colorizeText('', beautiful.blue),
-                                buttons = {
-                                    awful.button({}, 1, function()
-                                        awesome.emit_signal("lockscreen::show")
-                                        menu.visible = false
-                                    end)
-                                },
-                            }
+                                widget = wibox.container.margin,
+                                margins = dpi(4),
+                                lock
+                            },
                         },
                     },
                 },
@@ -290,14 +336,38 @@ awful.screen.connect_for_each_screen(function(s)
             widget = wibox.container.margin,
             margins = 16,
             {
-                layout = wibox.layout.flex.horizontal,
-                spacing = 20,
+                layout = wibox.layout.align.horizontal,
+                expand = "outside",
+                spacing = 10,
                 previous_wallpaper,
+                {
+                    widget = wibox.container.margin,
+                    margins = { right = 8, left = 8 },
+                    refresh_wallpaper
+                },
                 next_wallpaper
             },
         },
     }
-    
+
+    function brightness_slider:set_value_direct(value)
+        value = math.min(math.max(value, self:get_minimum()), self:get_maximum())
+        if value ~= self._private.value then
+            self._private.value = value
+            self:emit_signal("property::value", value, true)
+            self:emit_signal("widget::redraw_needed")
+        end
+    end
+
+    function volume_slider:set_value_direct(value)
+        value = math.min(math.max(value, self:get_minimum()), self:get_maximum())
+        if value ~= self._private.value then
+            self._private.value = value
+            self:emit_signal("property::value", value, true)
+            self:emit_signal("widget::redraw_needed")
+        end
+    end
+
     brightness_slider:buttons(gears.table.join(
         awful.button({}, 4, nil, function()
             if brightness_slider:get_value() > 100 then
@@ -332,34 +402,32 @@ awful.screen.connect_for_each_screen(function(s)
         end)
     ))
 
-    brightness_slider:connect_signal("property::value", function(_, new_value)
-        brightness_text.markup = helpers.colorizeText(new_value .. "%", beautiful.fg)
-        brightness_slider.value = new_value
-        brightness_module.set_brightness(new_value)
+    brightness_slider:connect_signal("property::value", function(_, value, direct)
+        brightness_text.markup = helpers.colorizeText(value .. "%", beautiful.text)
+        if direct then
+            return
+        else
+            brightness_module.set_brightness(value, nil, false)
+        end
     end)
     
-    volume_slider:connect_signal("property::value", function()
-        local volume_level = volume_slider:get_value()
-        volume_text.markup = helpers.colorizeText(volume_level .. "%", beautiful.fg)
-        volume_slider.value = volume_level
-        volume_module.set_volume(volume_level)
+    volume_slider:connect_signal("property::value", function(_, value, direct)
+        volume_text.markup = helpers.colorizeText(value .. "%", beautiful.text)
+        if direct then
+            return
+        else
+            volume_module.set_volume(value, false)
+        end
     end)
 
     local update_brightness_slider = function()
-        local value = string.gsub("100", "^%s*(.-)%s*$", "%1")
-        brightness_slider:set_value(tonumber(value))
-        brightness_text.text = value .. "%"
+        local value = brightness_module.get_brightness()
+        brightness_slider:set_value_direct(tonumber(value))
     end
 
     local update_volume_slider = function()
-        awful.spawn.easy_async_with_shell(
-            "amixer sget Master | awk -F'[][]' '/Right:|Mono:/ && NF > 1 {sub(/%/, \"\"); printf \"%0.0f\", $2}'",
-            function(stdout)
-                local value = string.gsub(stdout, "^%s*(.-)%s*$", "%1")
-                volume_slider:set_value(tonumber(value))
-                volume_text.text = value .. "%"
-            end
-        )
+        local value = volume_module.get_volume()
+        volume_slider:set_value_direct(tonumber(value))
     end
 
     update_brightness_slider()
@@ -374,10 +442,8 @@ awful.screen.connect_for_each_screen(function(s)
     end)
 
     awesome.connect_signal("menu::toggle", function()
-        if not menu.visible then
-            update_brightness_slider()
-            update_volume_slider()
-        end
+        update_brightness_slider()
+        update_volume_slider()
         menu.visible = not menu.visible
     end)
 end)

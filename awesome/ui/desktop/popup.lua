@@ -42,7 +42,7 @@ popup.prompt = wibox.widget {
       margins = 20,
     },
     widget = wibox.container.background,
-    bg = beautiful.mbg
+    bg = beautiful.base
   },
   forced_width = 470,
   widget = wibox.container.margin,
@@ -109,7 +109,7 @@ popup.widget:setup({
     valign = "center"
   },
   widget = wibox.container.background,
-  bg = beautiful.bg
+  bg = beautiful.base
 })
 
 local exclude = {

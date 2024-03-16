@@ -2,12 +2,13 @@ local awful = require("awful")
 local wibox = require("wibox")
 local beautiful = require("beautiful")
 local gears = require("gears")
+local naughty = require("naughty")
 
-local helpers = require('modules.helpers')
+local helpers = require("modules.helpers")
+
+local wall = require("modules.wall")
 
 local function is_maximized(c)
-
-	-- if window fills screen, remove rounded corners and translucent borders
 	local function _fills_screen()
 		local wa = c.screen.workarea
 		local cg = c:geometry()
@@ -30,16 +31,19 @@ awful.screen.connect_for_each_screen(function(s)
 end)
 
 client.connect_signal("property::fullscreen", function(c)
-    round_corners(c)
+    if c.fullscreen then
+        awful.titlebar.hide(c)
+    else
+        awful.titlebar.show(c)
+    end
 end)
+
 client.connect_signal("property::maximized", function(c)
     c.maximized = false
 end)
+
 client.connect_signal("property::minimized", function(c)
     c.minimized = false
-end)
-client.connect_signal("manage", function(c)
-    round_corners(c)
 end)
 
 client.connect_signal("property::floating", function(c)
@@ -49,6 +53,12 @@ client.connect_signal("property::floating", function(c)
     else
         c.ontop = false
         awful.titlebar.hide(c)
+    end
+end)
+
+client.connect_signal("request::manage", function(client, context)
+    if client.floating and context == "new" then
+        client.placement = awful.placement.centered
     end
 end)
 
@@ -64,6 +74,14 @@ screen.connect_signal("arrange", function(s)
     end
 end)
 
+naughty.connect_signal("request::display_error", function(message, startup)
+	naughty.notification {
+		urgency = "critical",
+		title = "Oops, an error happened" .. (startup and " during startup!" or "!"),
+		message = message
+	}
+end)
+
 --client.connect_signal("property::urgent", function(c) c:jump_to() end)
 
 require("awful.autofocus")
@@ -71,12 +89,12 @@ require("awful.autofocus")
 require("ui.bar")
 require("ui.better-resize")
 require("ui.savefloats")
-require("ui.exitscreen")
+--require("ui.exitscreen")
 require("ui.menu")
 require("ui.deco")
 require("ui.popup")
 require("ui.lockscreen")
-require("ui.indicator")
+--require("ui.indicator")
 require("ui.desktop")
 require("ui.rightclick")
 --require("ui.selrect")
