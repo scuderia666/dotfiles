@@ -2,7 +2,7 @@
 
 STEP=10
 
-get_brightness2() {
+get_brightness() {
     Brightness=$(xrandr --verbose --current | grep ^"$1" -A5 | tail -n1)
     number=${Brightness##* }
     value=${number#*.}
@@ -13,13 +13,8 @@ get_brightness2() {
     fi
 }
 
-get_brightness() {
-    Brightness=$(xrandr --verbose --current | grep ^"$1" -A5 | tail -n1)
-    echo ${Brightness##* }
-}
-
 change_brightness() {
-    current=$(get_brightness2 $2)
+    current=$(get_brightness $2)
     result=$current
 
     value=$1
@@ -64,7 +59,7 @@ if [[ "$1" == "get" ]]; then
         echo "no monitor given"
         exit 1
     fi
-    echo $(get_brightness2 $2)
+    echo $(get_brightness $2)
     exit 0
 fi
 
