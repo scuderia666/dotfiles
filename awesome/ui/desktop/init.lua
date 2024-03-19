@@ -65,7 +65,10 @@ local desktopdisplay = wibox {
       widget = wibox.container.margin,
       buttons = {
             awful.button({}, 4, function(t) awful.tag.viewprev(t.screen) end),
-            awful.button({}, 5, function(t) awful.tag.viewnext(t.screen) end)
+            awful.button({}, 5, function(t) awful.tag.viewnext(t.screen) end),
+
+            awful.button({ "Mod4" }, 4, function(t) awful.tag.viewprev(t.screen) end),
+            awful.button({ "Mod4" }, 5, function(t) awful.tag.viewnext(t.screen) end)
         },
     },
     manual,

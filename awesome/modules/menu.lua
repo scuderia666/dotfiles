@@ -145,13 +145,12 @@ end
 
 function menu.menu(widgets, width)
   local widget = awful.popup({
-    x = 32500,
-    type = "menu",
+    type = "popup_menu",
     visible = false,
     ontop = true,
     minimum_width = width or dpi(300),
     maximum_width = width or dpi(300),
-    shape = helpers.rrect(9),
+    --shape = helpers.rrect(9),
     bg = menu_color,
     widget = wibox.layout.fixed.vertical,
   })

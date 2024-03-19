@@ -1,4 +1,5 @@
 local awful = require("awful")
+local gears = require("gears")
 local filesystem = require("gears.filesystem")
 
 local brightness = require("modules.brightness")
@@ -120,7 +121,6 @@ awful.keyboard.append_global_keybindings({
 
 client.connect_signal("request::default_keybindings", function()
     awful.mouse.append_client_mousebindings({
-
         awful.button({ }, 1, function (c)
             c:activate { context = "mouse_click" }
         end),
@@ -133,6 +133,8 @@ client.connect_signal("request::default_keybindings", function()
             c:activate { context = "mouse_click", action = "mouse_resize"}
         end),
 
+        awful.button({ mod }, 4, function(t) awful.tag.viewprev(1) end),
+        awful.button({ mod }, 5, function(t) awful.tag.viewnext(1) end),
     })
 
     awful.keyboard.append_client_keybindings({
@@ -146,8 +148,7 @@ client.connect_signal("request::default_keybindings", function()
         end),
 
         awful.key({ mod }, "x", awful.client.floating.toggle),
-        --awful.key({ mod }, "x", awful.placement.centered),
-        --awful.key({ mod }, "x", awful.placement.centered + awful.placement.no_offscreen),
+        awful.key({ mod }, "c", awful.placement.centered),
     })
 end)
 

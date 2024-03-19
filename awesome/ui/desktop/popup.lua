@@ -17,7 +17,6 @@ popup.widget = wibox({
 
 popup.label = "Rename A File"
 
-
 popup.prompt = wibox.widget {
   {
     {

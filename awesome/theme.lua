@@ -89,6 +89,7 @@ beautiful.init(helpers.tableMerge(colors,{
     titlebar_bg_focus = colors.crust,
 
     bg_systray = colors.crust,
+    systray_icon_spacing = dpi(2),
 
     border_width = dpi(2),
     border_color_normal = colors.base,

@@ -36,7 +36,7 @@ return function(name, s, args)
 
     local indicator = wibox({
         shape = helpers.rrect(46),
-        type = "popup",
+        type = "tooltip",
         screen = s,
         width = width,
         height = height,

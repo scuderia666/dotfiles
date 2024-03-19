@@ -8,34 +8,8 @@ local helpers = require("modules.helpers")
 
 local wall = require("modules.wall")
 
-local function is_maximized(c)
-	local function _fills_screen()
-		local wa = c.screen.workarea
-		local cg = c:geometry()
-		return wa.x == cg.x and wa.y == cg.y and wa.width == cg.width and wa.height == cg.height
-	end
-
-	return c.maximized or (not c.floating and _fills_screen())
-end
-
-local function round_corners(c)
-    if not c.fullscreen and not is_maximized(c) then
-        c.shape = helpers.rrect(beautiful.rounded)
-    else
-        c.shape = gears.shape.rectangle
-    end
-end
-
 awful.screen.connect_for_each_screen(function(s)
-	awful.tag({"1", "2", "3", "4"}, s, awful.layout.layouts[2])
-end)
-
-client.connect_signal("property::fullscreen", function(c)
-    if c.fullscreen then
-        awful.titlebar.hide(c)
-    elseif c.floating then
-        awful.titlebar.show(c)
-    end
+    awful.tag({"1", "2", "3", "4"}, s, awful.layout.layouts[2])
 end)
 
 client.connect_signal("property::maximized", function(c)
@@ -47,18 +21,12 @@ client.connect_signal("property::minimized", function(c)
 end)
 
 client.connect_signal("property::floating", function(c)
-    if c.floating then
+	if c.floating and c.name ~= "Discord Updater" and c.role ~= "Popup" then
         c.ontop = true
         awful.titlebar.show(c)
     else
         c.ontop = false
         awful.titlebar.hide(c)
-    end
-end)
-
-client.connect_signal("request::manage", function(client, context)
-    if client.floating and context == "new" then
-        client.placement = awful.placement.centered
     end
 end)
 
@@ -75,8 +43,8 @@ screen.connect_signal("arrange", function(s)
 end)
 
 naughty.connect_signal("request::display_error", function(message, startup)
-	naughty.notification {
-		urgency = "critical",
+  naughty.notification {
+    urgency = "critical",
 		title = "Oops, an error happened" .. (startup and " during startup!" or "!"),
 		message = message
 	}
@@ -89,15 +57,13 @@ require("awful.autofocus")
 require("ui.bar")
 require("ui.better-resize")
 require("ui.savefloats")
---require("ui.exitscreen")
 require("ui.menu")
 require("ui.deco")
 require("ui.popup")
 require("ui.lockscreen")
---require("ui.indicator")
+require("ui.indicator")
 require("ui.desktop")
 require("ui.rightclick")
---require("ui.selrect")
 
 function updateBarsVisibility()
   for s in screen do
@@ -109,17 +75,17 @@ function updateBarsVisibility()
 end
 
 tag.connect_signal("property::selected", function(t)
-  updateBarsVisibility()
+    updateBarsVisibility()
 end)
 
 client.connect_signal("property::fullscreen", function(c)
-  c.first_tag.fullscreenMode = c.fullscreen
-  updateBarsVisibility()
+    c.first_tag.fullscreenMode = c.fullscreen
+	updateBarsVisibility()
 end)
 
 client.connect_signal("unmanage", function(c)
   if c.fullscreen then
-    c.screen.selected_tag.fullscreenMode = false
+	c.screen.selected_tag.fullscreenMode = false
     updateBarsVisibility()
   end
 end)
