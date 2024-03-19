@@ -376,6 +376,7 @@ awful.screen.connect_for_each_screen(function(s)
             end
             brightness_slider:set_value(brightness_slider:get_value() + 5)
         end),
+
         awful.button({}, 5, nil, function()
             if brightness_slider:get_value() < 0 then
                 brightness_slider:set_value(0)
@@ -391,19 +392,23 @@ awful.screen.connect_for_each_screen(function(s)
                 volume_slider:set_value(100)
                 return
             end
+
             volume_slider:set_value(volume_slider:get_value() + 5)
         end),
+
         awful.button({}, 5, nil, function()
             if volume_slider:get_value() < 0 then
                 volume_slider:set_value(0)
                 return
             end
+
             volume_slider:set_value(volume_slider:get_value() - 5)
         end)
     ))
 
     brightness_slider:connect_signal("property::value", function(_, value, direct)
         brightness_text.markup = helpers.colorizeText(value .. "%", beautiful.text)
+
         if direct then
             return
         else
@@ -413,6 +418,7 @@ awful.screen.connect_for_each_screen(function(s)
     
     volume_slider:connect_signal("property::value", function(_, value, direct)
         volume_text.markup = helpers.colorizeText(value .. "%", beautiful.text)
+
         if direct then
             return
         else
@@ -422,16 +428,19 @@ awful.screen.connect_for_each_screen(function(s)
 
     local update_brightness_slider = function()
         local value = brightness_module.get_brightness()
+        if value == nil then
+            return
+        end
         brightness_slider:set_value_direct(tonumber(value))
     end
 
     local update_volume_slider = function()
         local value = volume_module.get_volume()
+        if value == nil then
+            return
+        end
         volume_slider:set_value_direct(tonumber(value))
     end
-
-    update_brightness_slider()
-    update_volume_slider()
 
     awesome.connect_signal("update::brightness", function()
         update_brightness_slider()

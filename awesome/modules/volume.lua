@@ -38,7 +38,7 @@ volume.set_volume = function(value, update)
 end
 
 volume.get_volume = function()
-    awful.spawn.easy_async_with_shell("bash -c 'pamixer --get-volume'", function(stdout)
+    awful.spawn.easy_async_with_shell("pamixer --get-volume", function(stdout)
         volume_temp = tonumber(stdout)
     end)
 

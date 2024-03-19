@@ -33,7 +33,7 @@ end)
 client.connect_signal("property::fullscreen", function(c)
     if c.fullscreen then
         awful.titlebar.hide(c)
-    else
+    elseif c.floating then
         awful.titlebar.show(c)
     end
 end)
@@ -98,3 +98,41 @@ require("ui.lockscreen")
 require("ui.desktop")
 require("ui.rightclick")
 --require("ui.selrect")
+
+function updateBarsVisibility()
+  for s in screen do
+    if s.selected_tag then
+      local fullscreen = s.selected_tag.fullscreenMode
+      s.bar.visible = not fullscreen
+    end
+  end
+end
+
+tag.connect_signal("property::selected", function(t)
+  updateBarsVisibility()
+end)
+
+client.connect_signal("property::fullscreen", function(c)
+  c.first_tag.fullscreenMode = c.fullscreen
+  updateBarsVisibility()
+end)
+
+client.connect_signal("unmanage", function(c)
+  if c.fullscreen then
+    c.screen.selected_tag.fullscreenMode = false
+    updateBarsVisibility()
+  end
+end)
+
+awesome.connect_signal("widgets::splash::visibility", function(vis)
+	local t = screen.primary.selected_tag
+	if vis then
+		for idx, c in ipairs(t:clients()) do
+			c.hidden = true
+		end
+	else
+		for idx, c in ipairs(t:clients()) do
+			c.hidden = false
+		end
+	end
+end)

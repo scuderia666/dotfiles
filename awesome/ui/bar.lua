@@ -303,21 +303,4 @@ awful.screen.connect_for_each_screen(function(s)
             },
         }
     }
-
-    local function hide_bar(c)
-		if c.fullscreen or c.maximized then
-			c.screen.bar.visible = false
-		else
-			c.screen.bar.visible = true
-		end
-	end
-
-	local function show_bar(c)
-		if c.fullscreen or c.maximized then
-			c.screen.bar.visible = true
-		end
-	end
-
-    client.connect_signal("property::fullscreen", hide_bar)
-	client.connect_signal("request::unmanage", show_bar)
 end)

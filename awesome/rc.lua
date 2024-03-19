@@ -29,6 +29,9 @@ wall.set_wallpaper("dark_pixelart.png")
 collectgarbage("setpause", 110)
 collectgarbage("setstepmul", 1000)
 
+awesome.emit_signal("update::brightness")
+awesome.emit_signal("update::volume")
+
 gears.timer({
 	timeout = 5,
 	autostart = true,
