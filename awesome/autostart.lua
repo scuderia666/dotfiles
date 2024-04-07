@@ -29,4 +29,4 @@ run_once("/usr/libexec/polkit-gnome-authentication-agent-1")
 
 awful.spawn.once("pipewire")
 awful.spawn.once("picom --config " .. config_dir .. "/stuff/picom.conf")
-awful.spawn.once("vibrant-cli eDP-1-1 1.5")
+awful.spawn.once("vibrant-cli eDP-1-1 1.8")

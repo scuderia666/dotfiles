@@ -47,8 +47,8 @@ awful.screen.connect_for_each_screen(function(s)
 
     local menu = wibox.widget {
         widget = wibox.container.background,
-        --bg = beautiful.base,
-        --shape = helpers.rrect(8),
+        bg = beautiful.base,
+        shape = helpers.rrect(16),
         {
             widget = wibox.container.margin,
             margins = dpi(10),

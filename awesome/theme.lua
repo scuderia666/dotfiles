@@ -67,23 +67,20 @@ local tokyonight = {
     bg0 = "#1a1b26",
 }
 
-local shore = {
-    base = "#23232a"
-}
-
 beautiful.init(helpers.tableMerge(colors,{
     images = _images,
+
+    tn = tokyonight,
     
-    font = "Hermit",
+    font = "Recursive Casual Medium",
     icofont = "Material Design Icons Desktop",
 
     rounded = 12,
-    
     useless_gap = 4,
 
-    taglist_bg_focus = colors.lavender,
+    taglist_bg_focus = colors.red,
     taglist_bg_occupied = colors.surface0,
-    taglist_bg_empty = colors.mantle,
+    taglist_bg_empty = colors.base,
 
     titlebar_bg_normal = colors.mantle,
     titlebar_bg_focus = colors.crust,

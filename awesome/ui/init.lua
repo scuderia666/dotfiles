@@ -12,6 +12,20 @@ awful.screen.connect_for_each_screen(function(s)
     awful.tag({"1", "2", "3", "4"}, s, awful.layout.layouts[2])
 end)
 
+function update_client(c)
+  awful.titlebar.hide(c)
+
+  if c.floating then
+      c.ontop = true
+      if c.name ~= "Discord Updater" and c.role ~= "Popup" and c.type ~= "splash" then
+        awful.titlebar.show(c)
+      end
+  else
+      c.ontop = false
+      awful.titlebar.hide(c)
+  end
+end
+
 client.connect_signal("property::maximized", function(c)
     c.maximized = false
 end)
@@ -21,13 +35,7 @@ client.connect_signal("property::minimized", function(c)
 end)
 
 client.connect_signal("property::floating", function(c)
-	if c.floating and c.name ~= "Discord Updater" and c.role ~= "Popup" then
-        c.ontop = true
-        awful.titlebar.show(c)
-    else
-        c.ontop = false
-        awful.titlebar.hide(c)
-    end
+	update_client(c)
 end)
 
 screen.connect_signal("arrange", function(s)
@@ -80,12 +88,12 @@ end)
 
 client.connect_signal("property::fullscreen", function(c)
     c.first_tag.fullscreenMode = c.fullscreen
-	updateBarsVisibility()
+    updateBarsVisibility()
 end)
 
 client.connect_signal("unmanage", function(c)
   if c.fullscreen then
-	c.screen.selected_tag.fullscreenMode = false
+    c.screen.selected_tag.fullscreenMode = false
     updateBarsVisibility()
   end
 end)
