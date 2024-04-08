@@ -21,7 +21,7 @@ require("ui")
 require("rules")
 require("keys")
 require("autostart")
---require("dcbus")
+require("dcbus")
 
 wall = require("modules.wall")
 wall.refresh()

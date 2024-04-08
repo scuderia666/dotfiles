@@ -219,7 +219,7 @@ awful.screen.connect_for_each_screen(function(s)
 
     local clock = wibox.widget {
         widget = wibox.widget.textclock,
-        format = helpers.colorizeText("%I : %M", "#cdd6f4"),
+        format = helpers.colorizeText("%H : %M", "#cdd6f4"),
         font = "Roboto 11",
         align = "center",
         valign = "center",

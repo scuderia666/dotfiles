@@ -151,7 +151,7 @@ return function(s)
             },
         }
 
-        local notifbox = {
+        local notifbox = wibox.widget {
             widget = wibox.container.background,
             forced_width = 300,
             forced_height = 120,
